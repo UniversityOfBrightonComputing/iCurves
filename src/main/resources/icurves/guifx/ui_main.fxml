@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import icurves.guifx.FXRenderer?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane prefWidth="800.0" prefHeight="600.0"
+            xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="icurves.guifx.Controller">
+    <top>
+        <HBox>
+            <MenuBar BorderPane.alignment="CENTER">
+                <Menu mnemonicParsing="false" text="File">
+                    <MenuItem mnemonicParsing="false" text="New"        onAction="#new_"/>
+                    <MenuItem mnemonicParsing="false" text="Open..."    onAction="#open"/>
+                    <MenuItem mnemonicParsing="false" text="Save"       onAction="#save"/>
+                    <MenuItem mnemonicParsing="false" text="Save As..." onAction="#saveAs"/>
+                    <SeparatorMenuItem />
+                    <MenuItem mnemonicParsing="false" text="Quit" onAction="#quit"/>
+                </Menu>
+
+                <!--<Menu mnemonicParsing="false" text="Edit">-->
+                    <!--<MenuItem mnemonicParsing="false" text="Undo" onAction="#undo"/>-->
+                    <!--<MenuItem mnemonicParsing="false" text="Redo" onAction="#redo"/>-->
+                <!--</Menu>-->
+
+                <Menu fx:id="menuDiagrams" text="Diagrams" />
+
+                <Menu mnemonicParsing="false" text="Help">
+                    <MenuItem mnemonicParsing="false" text="About" onAction="#about"/>
+                </Menu>
+            </MenuBar>
+
+            <Button text="Settings" onAction="#settings"></Button>
+
+            <TextField prefWidth="400" fx:id="fieldInput" />
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fx:id="scrollPane">
+            <FXRenderer fx:id="renderer" />
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Slider fx:id="sliderZoom" min="0" max="100" value="15" blockIncrement="5"
+                    showTickLabels="true" showTickMarks="true" />
+        </HBox>
+    </bottom>
+
+    <left>
+        <!--<VBox prefWidth="200" spacing="10">-->
+            <!--<TextArea fx:id="areaInfo" editable="false" />-->
+        <!--</VBox>-->
+    </left>
+</BorderPane>

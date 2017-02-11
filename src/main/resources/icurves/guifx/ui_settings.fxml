@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import icurves.guifx.FXRenderer?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import icurves.decomposition.DecompositionStrategyType?>
+
+<ScrollPane prefWidth="400.0" prefHeight="400.0"
+            xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="icurves.guifx.SettingsController">
+
+    <fx:define>
+        <ToggleGroup fx:id="toggleDecomp" />
+        <ToggleGroup fx:id="toggleRecomp" />
+    </fx:define>
+
+    <VBox spacing="5" alignment="CENTER_LEFT">
+
+        <CheckBox fx:id="cbTwoStep" text="Use 2-step algorithm" selected="false" />
+        <CheckBox fx:id="cbParallel" text="Use multiple threads (faster)" selected="false" />
+
+
+
+
+
+        <Label text="Curves" />
+
+        <HBox spacing="10" alignment="TOP_LEFT">
+            <Label text="Base curve radius (px)" />
+            <TextField fx:id="fieldCurveRadius" text="1000" prefWidth="100" />
+        </HBox>
+
+        <CheckBox fx:id="cbSmooth" text="Smooth using Bezier approximation (slower)" selected="false" />
+
+        <HBox spacing="10" alignment="TOP_LEFT">
+            <Label text="Smooth factor [1-100]" />
+            <TextField fx:id="fieldSmoothFactor" text="10" prefWidth="100" />
+        </HBox>
+
+        <Separator orientation="HORIZONTAL" />
+
+
+
+
+
+        <Label text="Modified Euler dual" />
+
+        <HBox spacing="10" alignment="TOP_LEFT">
+            <Label text="Distance between MED and diagram (px)" />
+            <TextField fx:id="fieldMEDSize" text="100" prefWidth="100" />
+        </HBox>
+
+        <CheckBox fx:id="cbShowMED" text="Show final modified Euler dual (slower)" selected="true" />
+
+        <CheckBox fx:id="cbUseCircleApprox" text="Use circle approximation for zone centers (slower)" selected="false" />
+
+        <Separator orientation="HORIZONTAL" />
+
+
+
+
+
+        <Label text="Decomposition" />
+
+        <RadioButton text="Fewest-zone contours first" toggleGroup="$toggleDecomp" userData="DecompositionStrategyType.INNERMOST" selected="true" />
+
+        <Separator orientation="HORIZONTAL" />
+
+
+
+
+        <Label text="Recomposition" />
+
+        <RadioButton text="Shortest cycle first" toggleGroup="$toggleRecomp" selected="true" />
+
+        <Separator orientation="HORIZONTAL" />
+
+    </VBox>
+
+</ScrollPane>
