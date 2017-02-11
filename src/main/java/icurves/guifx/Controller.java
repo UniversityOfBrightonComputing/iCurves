@@ -3,7 +3,7 @@ package icurves.guifx;
 import icurves.CurvesApp;
 import icurves.description.Description;
 import icurves.concrete.ConcreteDiagram;
-import icurves.concrete.Contour;
+import icurves.diagram.Curve;
 import icurves.concrete.HamiltonianDiagramCreator;
 import icurves.description.AbstractCurve;
 import icurves.graph.EulerDualNode;
@@ -304,9 +304,9 @@ public class Controller {
             // else do Hamiltonian
             newCreator = new HamiltonianDiagramCreator(settings);
 
-            newCreator.getCurveToContour().addListener((MapChangeListener<? super AbstractCurve, ? super Contour>) change -> {
+            newCreator.getCurveToContour().addListener((MapChangeListener<? super AbstractCurve, ? super Curve>) change -> {
                 if (change.wasAdded()) {
-                    Contour c = change.getValueAdded();
+                    Curve c = change.getValueAdded();
 
                     renderer.addContour(c);
                 }

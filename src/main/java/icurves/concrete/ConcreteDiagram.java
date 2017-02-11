@@ -3,6 +3,7 @@ package icurves.concrete;
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
 import icurves.description.Description;
+import icurves.diagram.Curve;
 import icurves.geometry.Rectangle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,18 +20,18 @@ public class ConcreteDiagram {
     private static final Logger log = LogManager.getLogger(ConcreteDiagram.class);
 
     private final Rectangle box;
-    private final List<CircleContour> circles;
-    private final List<PathContour> contours;
+    private final List<CircleCurve> circles;
+    private final List<PathCurve> contours;
     private final List<ConcreteZone> shadedZones, allZones;
 
     private final Description original, actual;
-    private final Map<AbstractCurve, Contour> curveToContour;
+    private final Map<AbstractCurve, Curve> curveToContour;
 
     //public final List<Shape> shapes = new ArrayList<>();
 
     ConcreteDiagram(Description original, Description actual,
-                    List<CircleContour> circles,
-                    Map<AbstractCurve, Contour> curveToContour, int size, PathContour... contours) {
+                    List<CircleCurve> circles,
+                    Map<AbstractCurve, Curve> curveToContour, int size, PathCurve... contours) {
         this.original = original;
         this.actual = actual;
         this.box = new Rectangle(0, 0, size, size);
@@ -50,15 +51,6 @@ public class ConcreteDiagram {
                 .collect(Collectors.toList());
 
         log.info("Concrete zones : " + allZones);
-
-        Map<AbstractCurve, List<CircleContour> > duplicates = findDuplicateContours();
-
-        log.info("Duplicates: " + duplicates);
-        duplicates.values().forEach(contourList -> {
-            for (CircleContour contour : contourList) {
-                log.info("Contour " + contour + " is in " + getZonesContainingContour(contour));
-            }
-        });
     }
 
     /**
@@ -87,12 +79,12 @@ public class ConcreteDiagram {
      * @return the concrete zone
      */
     private ConcreteZone makeConcreteZone(AbstractBasicRegion zone) {
-        List<Contour> includingCircles = new ArrayList<>();
-        List<Contour> excludingCircles = new ArrayList<>(circles);
+        List<Curve> includingCircles = new ArrayList<>();
+        List<Curve> excludingCircles = new ArrayList<>(circles);
         excludingCircles.addAll(contours);
 
         for (AbstractCurve curve : zone.getInSet()) {
-            Contour contour = curveToContour.get(curve);
+            Curve contour = curveToContour.get(curve);
 
             excludingCircles.remove(contour);
             includingCircles.add(contour);
@@ -111,26 +103,26 @@ public class ConcreteDiagram {
         return box;
     }
 
-    public Map<AbstractCurve, Contour> getCurveToContour() {
+    public Map<AbstractCurve, Curve> getCurveToContour() {
         return curveToContour;
     }
 
     /**
      * @return diagram circle contours
      */
-    public List<CircleContour> getCircles() {
+    public List<CircleCurve> getCircles() {
         return circles;
     }
 
     /**
      * @return diagram arbitrary shape contours
      */
-    public List<PathContour> getContours() {
+    public List<PathCurve> getContours() {
         return contours;
     }
 
-    public List<Contour> getAllContours() {
-        List<Contour> contoursAll = new ArrayList<>();
+    public List<Curve> getAllContours() {
+        List<Curve> contoursAll = new ArrayList<>();
         contoursAll.addAll(circles);
         contoursAll.addAll(contours);
         return contoursAll;
@@ -187,7 +179,7 @@ public class ConcreteDiagram {
         int maxX = Integer.MIN_VALUE;
         int minY = Integer.MAX_VALUE;
         int maxY = Integer.MIN_VALUE;
-        for (CircleContour cc : circles) {
+        for (CircleCurve cc : circles) {
             if (cc.getMinX() < minX) {
                 minX = cc.getMinX();
             }
@@ -204,7 +196,7 @@ public class ConcreteDiagram {
 
         double midX = (minX + maxX) * 0.5;
         double midY = (minY + maxY) * 0.5;
-        for (CircleContour cc : circles) {
+        for (CircleCurve cc : circles) {
             cc.shift(-midX, -midY);
         }
 
@@ -212,35 +204,15 @@ public class ConcreteDiagram {
         double height = maxY - minY;
         double biggest_HW = Math.max(height, width);
         double scale = (size * 0.95) / biggest_HW;
-        for (CircleContour cc : circles) {
+        for (CircleCurve cc : circles) {
             cc.scaleAboutZero(scale);
         }
 
-        for (CircleContour cc : circles) {
+        for (CircleCurve cc : circles) {
             cc.shift(size * 0.5, size * 0.5);
         }
 
         // TODO: also scale path contours
-    }
-
-    /**
-     * Returns a map, where keys are abstract curves that map to all concrete contours
-     * for that curve. The map only contains duplicates, i.e. it won't contain a curve
-     * which only maps to a single contour.
-     *
-     * @return duplicate contours
-     */
-    public Map<AbstractCurve, List<CircleContour> > findDuplicateContours() {
-        Map<String, List<CircleContour> > groups = circles.stream()
-                .collect(Collectors.groupingBy(contour -> contour.getCurve().getLabel().replace("'", "")));
-
-        Map<AbstractCurve, List<CircleContour> > duplicates = new TreeMap<>();
-        groups.forEach((label, contours) -> {
-            if (contours.size() > 1)
-                duplicates.put(new AbstractCurve(label), contours);
-        });
-
-        return duplicates;
     }
 
     /**
@@ -249,9 +221,9 @@ public class ConcreteDiagram {
      * @param contour the contour
      * @return zones containing contour
      */
-    public List<ConcreteZone> getZonesContainingContour(CircleContour contour) {
+    public List<ConcreteZone> getZonesContainingContour(CircleCurve contour) {
         return allZones.stream()
-                .filter(zone -> zone.getContainingContours().contains(contour))
+                .filter(zone -> zone.getContainingCurves().contains(contour))
                 .collect(Collectors.toList());
     }
 

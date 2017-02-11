@@ -4,7 +4,7 @@ import icurves.CurvesApp
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.concrete.ConcreteZone
-import icurves.concrete.Contour
+import icurves.diagram.Curve
 import icurves.graph.cycles.CycleFinder
 import icurves.guifx.SettingsController
 import icurves.util.CannotDrawException
@@ -25,7 +25,7 @@ import java.util.stream.Stream
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-class MED(private val allZones: List<ConcreteZone>, private val allContours: Map<AbstractCurve, Contour>) {
+class MED(private val allZones: List<ConcreteZone>, private val allContours: Map<AbstractCurve, Curve>) {
 
     private val log = LogManager.getLogger(javaClass)
 
@@ -274,9 +274,9 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
     /**
      * Does curve segment [q] only pass through [actual] curve.
      */
-    private fun isOK(q: QuadCurve, actual: AbstractCurve, curves: List<Contour>): Boolean {
+    private fun isOK(q: QuadCurve, actual: AbstractCurve, curves: List<Curve>): Boolean {
         val list = curves.filter {
-            val s = it.shape
+            val s = it.computeShape()
             s.fill = null
             s.stroke = Color.BROWN
 
@@ -286,7 +286,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
         if (list.size != 1)
             return false
 
-        return list.get(0).curve == actual
+        return list.get(0).abstractCurve == actual
     }
 
     private fun computeMEDNodes(center: Point2D, radius: Double): List<EulerDualNode> {

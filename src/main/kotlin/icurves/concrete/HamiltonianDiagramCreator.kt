@@ -4,6 +4,7 @@ import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.description.Description
 import icurves.decomposition.DecomposerFactory
+import icurves.diagram.Curve
 import icurves.graph.MED
 import icurves.guifx.SettingsController
 import icurves.recomposition.BetterBasicRecomposer
@@ -36,7 +37,7 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
      * Maps abstract curve to its concrete version.
      * This is a 1 to 1 map since there are no duplicates.
      */
-    val curveToContour = FXCollections.observableMap(LinkedHashMap<AbstractCurve, Contour>())
+    val curveToContour = FXCollections.observableMap(LinkedHashMap<AbstractCurve, Curve>())
 
     /**
      * Abstract zones we **currently** occupy.
@@ -62,7 +63,7 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
             if (i == 0) {
 
                 // base case 1 curve
-                val contour = CircleContour(BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve(BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)
@@ -70,7 +71,7 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
             } else if (i == 1) {
 
                 // base case 2 curves
-                val contour = CircleContour((BASE_CURVE_RADIUS + 0) * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve((BASE_CURVE_RADIUS + 0) * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)
@@ -78,7 +79,7 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
             } else if (i == 2) {
 
                 // base case 3 curves
-                val contour = CircleContour((BASE_CURVE_RADIUS + 0) * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve((BASE_CURVE_RADIUS + 0) * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS, data.addedCurve)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)
@@ -95,9 +96,9 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
                         // if the rest of the app worked properly, this will never happen because there is >= 1 Hamiltonian cycles
                 .orElseThrow { CannotDrawException("Failed to find cycle") }
 
-                //var contour: Contour = PathContour(data.addedCurve, cycle.path)
+                //var curve: Curve = PathCurve(data.addedCurve, cycle.path)
 
-                var contour: Contour = PolygonContour(data.addedCurve, cycle.nodes.map { it.point })
+                var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
 
                 // smooth curves if required
                 if (settings.useSmooth()) {
@@ -171,12 +172,12 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
                     newPath.fill = Color.TRANSPARENT
                     newPath.elements.add(ClosePath())
 
-                    contour = PathContour(data.addedCurve, newPath)
+                    curve = PathCurve(data.addedCurve, newPath)
 
                     Profiler.end("Smoothing")
                 }
 
-                curveToContour[data.addedCurve] = contour
+                curveToContour[data.addedCurve] = curve
 
                 // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
                 // we also call distinct() to ensure we don't reuse the outside zone more than once
@@ -202,8 +203,8 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
      * @return the concrete zone
      */
 //    private fun makeConcreteZone(zone: AbstractBasicRegion): ConcreteZone {
-//        val includingCircles = ArrayList<Contour>()
-//        val excludingCircles = ArrayList<Contour>(curveToContour.values)
+//        val includingCircles = ArrayList<Curve>()
+//        val excludingCircles = ArrayList<Curve>(curveToContour.values)
 //
 //        for (curve in zone.inSet) {
 //            val contour = curveToContour[curve]
@@ -238,9 +239,9 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
     /**
      * Does curve segment [q] only pass through [actual] curve.
      */
-    fun isOK(q: Shape, actual: AbstractCurve, curves: List<Contour>): Boolean {
+    fun isOK(q: Shape, actual: AbstractCurve, curves: List<Curve>): Boolean {
         val list = curves.filter {
-            val s = it.shape
+            val s = it.computeShape()
             s.fill = null
             s.stroke = Color.BROWN
 
@@ -250,15 +251,15 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
         if (list.size != 1)
             return false
 
-        return list.get(0).curve == actual
+        return list.get(0).abstractCurve == actual
     }
 
     /**
      * Does curve segment [q] intersect with any other curves.
      */
-    fun intersects(q: Shape, curves: List<Contour>): Boolean {
+    fun intersects(q: Shape, curves: List<Curve>): Boolean {
         val list = curves.filter {
-            val s = it.shape
+            val s = it.computeShape()
             s.fill = null
             s.stroke = Color.BROWN
 
@@ -303,6 +304,6 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
     //                    //println(center)
     //                    //debugPoints.add(center)
     //
-    //                    contour = CircleContour(center.x, center.y, minRadius, data.addedCurve)
+    //                    contour = CircleCurve(center.x, center.y, minRadius, data.addedCurve)
     //                }
 }

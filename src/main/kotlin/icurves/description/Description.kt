@@ -3,7 +3,7 @@ package icurves.description
 import java.util.*
 
 /**
- *
+ * A description, D = (K, B, l), of an Euler diagram.
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
@@ -23,14 +23,11 @@ data class Description(private val curvesInternal: Set<AbstractCurve>, private v
 
     fun includesZone(zone: AbstractBasicRegion) = zones.contains(zone)
 
-    /**
-     * @return abstract description in informal string form
-     */
     fun getInformalDescription(): String {
         val sb = StringBuilder();
         for (zone in zones) {
-            for (curve in zone.inSet) {
-                sb.append(curve.label);
+            for ((label) in zone.inSet) {
+                sb.append(label);
             }
 
             sb.append(" ");

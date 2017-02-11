@@ -1,6 +1,7 @@
 package icurves.concrete;
 
 import icurves.description.AbstractCurve;
+import icurves.diagram.Curve;
 import icurves.util.Converter;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -14,18 +15,18 @@ import java.util.List;
 /**
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-public class PolygonContour extends Contour {
+public class PolygonCurve extends Curve {
 
     private Polygon polygonFX;
 
-    public PolygonContour(AbstractCurve curve, List<Point2D> points) {
+    public PolygonCurve(AbstractCurve curve, List<Point2D> points) {
         super(curve);
 
         polygonFX = Converter.toPolygonFX(points);
     }
 
     @Override
-    public Shape getShape() {
+    public Shape computeShape() {
         Rectangle bbox = new Rectangle(10000, 10000);
         bbox.setTranslateX(-3000);
         bbox.setTranslateY(-3000);
@@ -39,7 +40,7 @@ public class PolygonContour extends Contour {
     }
 
     @Override
-    public Polygon2D toPolygon() {
+    public Polygon2D computePolygon() {
         return Converter.toPolygon2D(polygonFX);
     }
 }

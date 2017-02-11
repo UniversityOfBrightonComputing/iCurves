@@ -1,6 +1,7 @@
 package icurves.concrete;
 
 import icurves.description.AbstractCurve;
+import icurves.diagram.Curve;
 import icurves.util.Converter;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
@@ -9,7 +10,7 @@ import math.geom2d.polygon.Polygon2D;
 /**
  * Concrete form of AbstractCurve.
  */
-public class CircleContour extends Contour {
+public class CircleCurve extends Curve {
     double centerX;
     double centerY;
     double radius;
@@ -23,7 +24,7 @@ public class CircleContour extends Contour {
      * @param radius contour radius
      * @param curve abstract curve
      */
-    public CircleContour(double centerX, double centerY, double radius, AbstractCurve curve) {
+    public CircleCurve(double centerX, double centerY, double radius, AbstractCurve curve) {
         super(curve);
         this.centerX = centerX;
         this.centerY = centerY;
@@ -92,24 +93,14 @@ public class CircleContour extends Contour {
     }
 
     @Override
-    public Shape getShape() {
+    public Shape computeShape() {
         // big for containing intersect
         // small for exluding subtract
         return new Circle(getCenterX(), getCenterY(), getBigRadius());
     }
 
     @Override
-    public Polygon2D toPolygon() {
+    public Polygon2D computePolygon() {
         return Converter.circleToPolygon(this);
-    }
-
-    public String toDebugString() {
-        return String.format("Circle[center=(%.0f,%.0f),radius=%.0f,curve=%s]",
-                centerX, centerY, radius, getCurve());
-    }
-
-    @Override
-    public String toString() {
-        return getCurve().toString();
     }
 }

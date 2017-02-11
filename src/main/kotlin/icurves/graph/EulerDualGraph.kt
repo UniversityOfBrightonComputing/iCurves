@@ -3,7 +3,7 @@ package icurves.graph
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.concrete.ConcreteDiagram
-import icurves.concrete.Contour
+import icurves.diagram.Curve
 import icurves.graph.cycles.CycleFinder
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
@@ -198,9 +198,9 @@ class EulerDualGraph(val diagram: ConcreteDiagram) {
 
     private var tmpPoint = Point2D.ZERO
 
-    fun isOK(q: QuadCurve, actual: AbstractCurve, curves: List<Contour>): Boolean {
+    fun isOK(q: QuadCurve, actual: AbstractCurve, curves: List<Curve>): Boolean {
         val list = curves.filter {
-            val s = it.shape
+            val s = it.computeShape()
             s.fill = null
             s.stroke = Color.BROWN
 
@@ -210,7 +210,7 @@ class EulerDualGraph(val diagram: ConcreteDiagram) {
         if (list.size != 1)
             return false
 
-        return list.get(0).curve == actual
+        return list.get(0).abstractCurve == actual
     }
 
     fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): Optional<GraphCycle<EulerDualNode, EulerDualEdge>> {

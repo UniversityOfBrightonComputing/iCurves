@@ -3,6 +3,7 @@ package icurves.concrete;
 import icurves.CurvesApp;
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
+import icurves.diagram.Curve;
 import icurves.guifx.SettingsController;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -39,12 +40,12 @@ public class ConcreteZone {
     /**
      * Contours within this zone.
      */
-    private final List<Contour> containingContours;
+    private final List<Curve> containingCurves;
 
     /**
      * Contours outside of this zone.
      */
-    private final List<Contour> excludingContours;
+    private final List<Curve> excludingCurves;
 
     public Shape bbox = null;
 
@@ -54,13 +55,13 @@ public class ConcreteZone {
      * Constructs a concrete zone from abstract zone given containing and excluding contours.
      *
      * @param zone abstract zone
-     * @param containingContours containing contours
-     * @param excludingContours   excluding contours
+     * @param containingCurves containing contours
+     * @param excludingCurves   excluding contours
      */
-    public ConcreteZone(AbstractBasicRegion zone, List<Contour> containingContours, List<Contour> excludingContours) {
+    public ConcreteZone(AbstractBasicRegion zone, List<Curve> containingCurves, List<Curve> excludingCurves) {
         this.zone = zone;
-        this.containingContours = containingContours;
-        this.excludingContours = excludingContours;
+        this.containingCurves = containingCurves;
+        this.excludingCurves = excludingCurves;
 
         settings = CurvesApp.getInstance().getSettings();
 
@@ -70,17 +71,17 @@ public class ConcreteZone {
         bbox.setTranslateY(-3000);
     }
 
-    public ConcreteZone(AbstractBasicRegion zone, Map<AbstractCurve, Contour> curveToContour) {
+    public ConcreteZone(AbstractBasicRegion zone, Map<AbstractCurve, Curve> curveToContour) {
         this.zone = zone;
 
-        containingContours = new ArrayList<>();
-        excludingContours = new ArrayList<>(curveToContour.values());
+        containingCurves = new ArrayList<>();
+        excludingCurves = new ArrayList<>(curveToContour.values());
 
         for (AbstractCurve curve : zone.getInSet()) {
-            Contour contour = curveToContour.get(curve);
+            Curve contour = curveToContour.get(curve);
 
-            excludingContours.remove(contour);
-            containingContours.add(contour);
+            excludingCurves.remove(contour);
+            containingCurves.add(contour);
         }
 
         settings = CurvesApp.getInstance().getSettings();
@@ -98,26 +99,26 @@ public class ConcreteZone {
     /**
      * @return contours within this zone
      */
-    public List<Contour> getContainingContours() {
-        return containingContours;
+    public List<Curve> getContainingCurves() {
+        return containingCurves;
     }
 
     /**
      * @return contours outside of this zone
      */
-    public List<Contour> getExcludingContours() {
-        return excludingContours;
+    public List<Curve> getExcludingCurves() {
+        return excludingCurves;
     }
 
     public Shape getShape() {
         Shape shape = bbox;
 
-        for (Contour contour : getContainingContours()) {
-            shape = Shape.intersect(shape, contour.getShape());
+        for (Curve curve : getContainingCurves()) {
+            shape = Shape.intersect(shape, curve.getShape());
         }
 
-        for (Contour contour : getExcludingContours()) {
-            shape = Shape.subtract(shape, contour.getShape());
+        for (Curve curve : getExcludingCurves()) {
+            shape = Shape.subtract(shape, curve.getShape());
         }
 
         return shape;
@@ -319,11 +320,11 @@ public class ConcreteZone {
                 new math.geom2d.Point2D(10000, 10000),
                 new math.geom2d.Point2D(0, 10000));
 
-        containingContours.stream().map(c -> c.toPolygon()).forEach(p -> {
+        containingCurves.stream().map(c -> c.getPolygon()).forEach(p -> {
             polygonShape = Polygons2D.intersection(polygonShape, p);
         });
 
-        excludingContours.stream().map(c -> c.toPolygon()).forEach(p -> {
+        excludingCurves.stream().map(c -> c.getPolygon()).forEach(p -> {
             polygonShape = Polygons2D.difference(polygonShape, p);
         });
 
@@ -370,8 +371,8 @@ public class ConcreteZone {
 
     public String toDebugString() {
         return "ConcreteZone:[zone=" + zone + "\n"
-                + "containing: " + containingContours.toString() + "\n"
-                + "excluding:  " + excludingContours.toString() + "]";
+                + "containing: " + containingCurves.toString() + "\n"
+                + "excluding:  " + excludingCurves.toString() + "]";
     }
 
     @Override

@@ -1,6 +1,6 @@
 package icurves.util
 
-import icurves.concrete.CircleContour
+import icurves.concrete.CircleCurve
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
@@ -16,7 +16,7 @@ import java.util.*
 class Converter {
 
     companion object {
-        @JvmStatic fun circleToPolygon(circle: CircleContour): Polygon2D {
+        @JvmStatic fun circleToPolygon(circle: CircleCurve): Polygon2D {
             val fxPoly = makePolygon(circle.radius.toInt(), 16)
             fxPoly.translateX = circle.minX.toDouble()
             fxPoly.translateY = circle.minY.toDouble()

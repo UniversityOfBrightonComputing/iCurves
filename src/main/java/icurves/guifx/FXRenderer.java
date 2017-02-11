@@ -2,6 +2,7 @@ package icurves.guifx;
 
 import icurves.description.AbstractCurve;
 import icurves.concrete.*;
+import icurves.diagram.Curve;
 import icurves.graph.EulerDualGraph;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
@@ -62,13 +63,13 @@ public class FXRenderer extends Pane {
         rootShadedZones.getChildren().clear();
     }
 
-    public void addContour(Contour contour) {
-        Shape s = contour.getShape();
+    public void addContour(Curve curve) {
+        Shape s = curve.getShape();
         s.setStrokeWidth(16);
         s.setStroke(colors.get(colorIndex++));
         s.setFill(null);
 
-        Text label = new Text(contour.getCurve().getLabel());
+        Text label = new Text(curve.toString());
         label.setFont(Font.font(72));
         label.setFill(s.getStroke());
         label.setTranslateX(s.getLayoutBounds().getMaxX());
@@ -110,17 +111,17 @@ public class FXRenderer extends Pane {
 
         List<ConcreteZone> normalZones = new ArrayList<>(diagram.getAllZones());
         normalZones.removeAll(diagram.getShadedZones());
-        //normalZones.removeIf(z -> z.getContainingContours().isEmpty());
+        //normalZones.removeIf(z -> z.getContainingCurves().isEmpty());
 
         for (ConcreteZone zone : normalZones)
             drawNormalZone(zone, bbox);
 
-        for (CircleContour contour : diagram.getCircles())
+        for (CircleCurve contour : diagram.getCircles())
             drawCircleContour(contour);
 
         rootSceneGraph.getChildren().clear();
 
-        for (PathContour contour : diagram.getContours()) {
+        for (PathCurve contour : diagram.getContours()) {
             rootSceneGraph.getChildren().addAll(contour.getShape());
         }
     }
@@ -182,12 +183,12 @@ public class FXRenderer extends Pane {
     private void drawShadedZone(ConcreteZone zone, Rectangle bbox) {
         Shape shape = bbox;
 
-        for (Contour contour : zone.getContainingContours()) {
-            shape = Shape.intersect(shape, contour.getShape());
+        for (Curve curve : zone.getContainingCurves()) {
+            shape = Shape.intersect(shape, curve.getShape());
         }
 
-        for (Contour contour : zone.getExcludingContours()) {
-            shape = Shape.subtract(shape, contour.getShape());
+        for (Curve curve : zone.getExcludingCurves()) {
+            shape = Shape.subtract(shape, curve.getShape());
         }
 
         Tooltip.install(shape, new Tooltip(zone.toDebugString()));
@@ -200,12 +201,12 @@ public class FXRenderer extends Pane {
         //Shape shape = bbox;
 
         Shape shape = zone.getShape();
-//        for (Contour contour : zone.getContainingContours()) {
-//            shape = Shape.intersect(shape, contour.getShape());
+//        for (Curve contour : zone.getContainingCurves()) {
+//            shape = Shape.intersect(shape, contour.computeShape());
 //        }
 //
-//        for (Contour contour : zone.getExcludingContours()) {
-//            shape = Shape.subtract(shape, contour.getShape());
+//        for (Curve contour : zone.getExcludingCurves()) {
+//            shape = Shape.subtract(shape, contour.computeShape());
 //        }
 
         Tooltip.install(shape, new Tooltip(zone.toDebugString()));
@@ -236,7 +237,7 @@ public class FXRenderer extends Pane {
 //        }
     }
 
-    private void drawCircleContour(CircleContour contour) {
+    private void drawCircleContour(CircleCurve contour) {
         g.setFill(Color.BLACK);
         g.setStroke(colors.get(colorIndex++));
         g.setLineWidth(16);
@@ -249,7 +250,7 @@ public class FXRenderer extends Pane {
         double h = 2 * radius;
 
         g.strokeOval(x, y, w, h);
-        g.fillText(contour.getCurve().getLabel(), contour.getLabelXPosition(), contour.getLabelYPosition());
+        g.fillText(contour.toString(), contour.getLabelXPosition(), contour.getLabelYPosition());
     }
 
     public void drawPoints(List<Point2D> points) {
