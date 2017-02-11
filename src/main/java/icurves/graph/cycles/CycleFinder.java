@@ -1,13 +1,13 @@
 package icurves.graph.cycles;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import icurves.graph.GraphCycle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is an adapted version from the following stackoverflow answer:

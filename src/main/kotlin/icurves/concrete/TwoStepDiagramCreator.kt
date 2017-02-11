@@ -1,6 +1,5 @@
 package icurves.concrete
 
-import icurves.abstractdescription.AbstractBasicRegion
 import icurves.abstractdescription.AbstractCurve
 import icurves.abstractdescription.AbstractDescription
 import icurves.decomposition.DecomposerFactory
@@ -11,7 +10,6 @@ import icurves.recomposition.RecompositionStrategyType
 import icurves.util.CannotDrawException
 import org.apache.logging.log4j.LogManager
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  *

@@ -1,8 +1,8 @@
 package icurves.concrete;
 
+import icurves.CurvesApp;
 import icurves.abstractdescription.AbstractBasicRegion;
 import icurves.abstractdescription.AbstractCurve;
-import icurves.guifx.FXApplication;
 import icurves.guifx.SettingsController;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -15,7 +15,10 @@ import math.geom2d.polygon.SimplePolygon2D;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
@@ -59,7 +62,7 @@ public class ConcreteZone {
         this.containingContours = containingContours;
         this.excludingContours = excludingContours;
 
-        settings = FXApplication.getInstance().getSettings();
+        settings = CurvesApp.getInstance().getSettings();
 
         // TODO: make global bbox
         bbox = new Rectangle(10000.0, 10000.0);
@@ -80,7 +83,7 @@ public class ConcreteZone {
             containingContours.add(contour);
         }
 
-        settings = FXApplication.getInstance().getSettings();
+        settings = CurvesApp.getInstance().getSettings();
 
         // TODO: make global bbox
         bbox = new Rectangle(10000.0, 10000.0);

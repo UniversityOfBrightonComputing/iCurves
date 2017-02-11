@@ -1,9 +1,7 @@
 package icurves.concrete
 
 import javafx.geometry.Point2D
-import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.shape.ClosePath
 import javafx.scene.shape.LineTo
 import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path

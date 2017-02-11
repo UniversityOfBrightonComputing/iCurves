@@ -1,7 +1,6 @@
 package icurves.abstractdescription
 
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  *

@@ -2,7 +2,10 @@ package icurves.concrete;
 
 import icurves.abstractdescription.AbstractCurve;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)

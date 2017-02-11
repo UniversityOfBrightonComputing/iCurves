@@ -1,6 +1,5 @@
 package icurves.graph
 
-import javafx.scene.shape.QuadCurve
 import javafx.scene.shape.Shape
 
 /**

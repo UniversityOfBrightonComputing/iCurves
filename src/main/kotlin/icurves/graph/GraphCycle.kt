@@ -1,8 +1,6 @@
 package icurves.graph
 
-import icurves.abstractdescription.AbstractBasicRegion
 import javafx.scene.shape.Path
-import javafx.scene.shape.Polygon
 
 
 /**

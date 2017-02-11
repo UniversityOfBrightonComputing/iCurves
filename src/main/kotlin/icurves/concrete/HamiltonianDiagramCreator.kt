@@ -4,8 +4,6 @@ import icurves.abstractdescription.AbstractBasicRegion
 import icurves.abstractdescription.AbstractCurve
 import icurves.abstractdescription.AbstractDescription
 import icurves.decomposition.DecomposerFactory
-import icurves.graph.EulerDualEdge
-import icurves.graph.EulerDualNode
 import icurves.graph.MED
 import icurves.guifx.SettingsController
 import icurves.recomposition.BetterBasicRecomposer
@@ -14,7 +12,9 @@ import icurves.util.Profiler
 import javafx.collections.FXCollections
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
-import javafx.scene.shape.*
+import javafx.scene.shape.ClosePath
+import javafx.scene.shape.Path
+import javafx.scene.shape.Shape
 import org.apache.logging.log4j.LogManager
 import java.util.*
 

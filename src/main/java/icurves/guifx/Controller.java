@@ -1,5 +1,6 @@
 package icurves.guifx;
 
+import icurves.CurvesApp;
 import icurves.abstractdescription.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 import icurves.concrete.ConcreteDiagram;
@@ -86,7 +87,7 @@ public class Controller {
             settings = fxmlLoader.getController();
 
             // set global settings hack
-            FXApplication.getInstance().setSettings(settings);
+            CurvesApp.getInstance().setSettings(settings);
 
             dialogSettings.getDialogPane().setContent(root);
         } catch (Exception e) {

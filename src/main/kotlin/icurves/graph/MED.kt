@@ -1,13 +1,11 @@
 package icurves.graph
 
+import icurves.CurvesApp
 import icurves.abstractdescription.AbstractBasicRegion
 import icurves.abstractdescription.AbstractCurve
-import icurves.concrete.ConcreteDiagram
 import icurves.concrete.ConcreteZone
 import icurves.concrete.Contour
-import icurves.concrete.HamiltonianDiagramCreator
 import icurves.graph.cycles.CycleFinder
-import icurves.guifx.FXApplication
 import icurves.guifx.SettingsController
 import icurves.util.CannotDrawException
 import icurves.util.Converter
@@ -40,7 +38,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
     private val settings: SettingsController
 
     init {
-        settings = FXApplication.getInstance().settings
+        settings = CurvesApp.getInstance().settings
 
         Profiler.start("Creating EGD nodes")
 

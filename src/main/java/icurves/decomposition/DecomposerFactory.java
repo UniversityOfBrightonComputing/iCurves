@@ -4,7 +4,10 @@ import icurves.abstractdescription.AbstractBasicRegion;
 import icurves.abstractdescription.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Creates decomposers.
