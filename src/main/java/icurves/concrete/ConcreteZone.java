@@ -1,8 +1,8 @@
 package icurves.concrete;
 
 import icurves.CurvesApp;
-import icurves.abstractdescription.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.AbstractCurve;
 import icurves.guifx.SettingsController;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

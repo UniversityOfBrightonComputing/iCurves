@@ -1,6 +1,6 @@
 package icurves.concrete;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import icurves.util.Converter;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;

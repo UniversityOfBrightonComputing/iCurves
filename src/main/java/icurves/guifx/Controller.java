@@ -1,18 +1,13 @@
 package icurves.guifx;
 
 import icurves.CurvesApp;
-import icurves.abstractdescription.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 import icurves.concrete.ConcreteDiagram;
 import icurves.concrete.Contour;
-import icurves.concrete.DiagramCreator;
 import icurves.concrete.HamiltonianDiagramCreator;
-import icurves.decomposition.DecomposerFactory;
-import icurves.decomposition.DecompositionStrategyType;
+import icurves.description.AbstractCurve;
 import icurves.graph.EulerDualNode;
 import icurves.graph.MED;
-import icurves.recomposition.RecomposerFactory;
-import icurves.recomposition.RecompositionStrategyType;
 import icurves.util.ExampleData;
 import icurves.util.ExampleDiagram;
 import icurves.util.Examples;
@@ -305,19 +300,6 @@ public class Controller {
             long startTime = System.nanoTime();
 
             Platform.runLater(renderer::clearRenderer);
-
-            // try modified original iCircles
-            if (settings.isTwoStep()) {
-                DiagramCreator creator = new DiagramCreator(
-                        DecomposerFactory.newDecomposer(DecompositionStrategyType.PIERCED_FIRST),
-                        RecomposerFactory.newRecomposer(RecompositionStrategyType.DOUBLY_PIERCED_EXTRA_ZONES)
-                );
-
-                ConcreteDiagram diagram0 = creator.createDiagram(description, 4000);
-                if (diagram0.findDuplicateContours().isEmpty()) {
-                    return diagram0;
-                }
-            }
 
             // else do Hamiltonian
             newCreator = new HamiltonianDiagramCreator(settings);

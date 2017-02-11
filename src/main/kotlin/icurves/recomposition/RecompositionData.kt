@@ -1,7 +1,7 @@
 package icurves.recomposition
 
-import icurves.abstractdescription.AbstractBasicRegion
-import icurves.abstractdescription.AbstractCurve
+import icurves.description.AbstractBasicRegion
+import icurves.description.AbstractCurve
 
 /**
  * Holds data for a single recomposition step.

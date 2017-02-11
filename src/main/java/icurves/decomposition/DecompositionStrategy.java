@@ -1,6 +1,6 @@
 package icurves.decomposition;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 
 import java.util.List;

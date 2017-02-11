@@ -1,8 +1,8 @@
 package icurves.graph
 
 import icurves.CurvesApp
-import icurves.abstractdescription.AbstractBasicRegion
-import icurves.abstractdescription.AbstractCurve
+import icurves.description.AbstractBasicRegion
+import icurves.description.AbstractCurve
 import icurves.concrete.ConcreteZone
 import icurves.concrete.Contour
 import icurves.graph.cycles.CycleFinder

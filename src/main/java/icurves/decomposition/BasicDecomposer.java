@@ -1,7 +1,7 @@
 package icurves.decomposition;
 
-import icurves.abstractdescription.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

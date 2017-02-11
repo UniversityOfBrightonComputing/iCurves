@@ -1,6 +1,6 @@
 package icurves.concrete;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import javafx.scene.shape.Shape;
 import math.geom2d.polygon.Polygon2D;
 

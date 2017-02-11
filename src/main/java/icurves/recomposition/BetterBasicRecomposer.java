@@ -1,7 +1,7 @@
 package icurves.recomposition;
 
-import icurves.abstractdescription.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 import icurves.abstractdual.AbstractDualGraph;
 import icurves.abstractdual.AbstractDualNode;

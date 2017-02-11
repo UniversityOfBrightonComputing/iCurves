@@ -1,5 +1,6 @@
-package icurves.abstractdescription
+package icurves.description
 
+import icurves.description.AbstractCurve
 import java.util.*
 
 /**
@@ -29,18 +30,6 @@ data class AbstractBasicRegion(private val inSetInternal: Set<AbstractCurve>) : 
     fun moveInside(curve: AbstractCurve) = AbstractBasicRegion(inSet.plus(curve))
 
     fun moveOutside(curve: AbstractCurve) = AbstractBasicRegion(inSet.minus(curve))
-
-    fun hasCurveWithlabel(label: String): Boolean {
-        for (curve in inSet)
-            if (curve.matchesLabel(AbstractCurve(label)))
-                return true
-
-        return false
-    }
-
-    fun moveOutsideNew(curve: AbstractCurve): AbstractBasicRegion {
-        return AbstractBasicRegion(inSet.filter { !it.matchesLabel(curve) }.toSet())
-    }
 
     fun getStraddledContour(otherRegion: AbstractBasicRegion): Optional<AbstractCurve> {
         if (inSet.size == otherRegion.inSet.size)

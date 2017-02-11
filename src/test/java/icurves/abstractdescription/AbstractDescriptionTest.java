@@ -1,5 +1,6 @@
 package icurves.abstractdescription;
 
+import icurves.description.AbstractCurve;
 import org.junit.Before;
 import org.junit.Test;
 

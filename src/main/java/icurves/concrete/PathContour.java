@@ -1,6 +1,6 @@
 package icurves.concrete;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.Path;

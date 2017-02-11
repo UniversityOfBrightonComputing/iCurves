@@ -1,6 +1,6 @@
 package icurves.recomposition;
 
-import icurves.abstractdescription.AbstractBasicRegion;
+import icurves.description.AbstractBasicRegion;
 import icurves.abstractdescription.AbstractDescription;
 
 import java.util.List;

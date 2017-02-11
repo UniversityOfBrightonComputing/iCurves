@@ -1,7 +1,7 @@
 package icurves.abstractdual;
 
-import icurves.abstractdescription.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.AbstractCurve;
 import icurves.graph.GraphCycle;
 import icurves.graph.cycles.CycleFinder;
 import org.apache.logging.log4j.LogManager;

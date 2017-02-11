@@ -32,16 +32,19 @@ public final class RecompositionStep {
             throw new IllegalArgumentException("No added curve in recomp");
         }
 
-        String label = addedContourData.get(0).getAddedCurve().getLabel();
-        for (RecompositionData data : addedContourData) {
-            if (!data.getAddedCurve().matchesLabel(addedContourData.get(0).getAddedCurve()))
-                throw new IllegalArgumentException("Mixed curves added in recomp");
-        }
+        if (addedContourData.size() > 1)
+            throw new IllegalArgumentException("More than 1 contour data in single step?");
 
-        if (from.includesLabel(label))
-            throw new IllegalArgumentException("Added curve already present");
-        if (!to.includesLabel(label))
-            throw new IllegalArgumentException("Added curve not present in next description");
+//        String label = addedContourData.get(0).getAddedCurve().getLabel();
+//        for (RecompositionData data : addedContourData) {
+//            if (!data.getAddedCurve().matchesLabel(addedContourData.get(0).getAddedCurve()))
+//                throw new IllegalArgumentException("Mixed curves added in recomp");
+//        }
+
+//        if (from.includesLabel(label))
+//            throw new IllegalArgumentException("Added curve already present");
+//        if (!to.includesLabel(label))
+//            throw new IllegalArgumentException("Added curve not present in next description");
     }
 
     /**

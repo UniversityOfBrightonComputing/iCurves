@@ -1,6 +1,6 @@
 package icurves.abstractdual;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 
 public class AbstractDualEdge {
 

@@ -1,6 +1,6 @@
 package icurves.concrete;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import icurves.util.Converter;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

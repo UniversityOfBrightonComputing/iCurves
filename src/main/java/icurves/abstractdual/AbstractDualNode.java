@@ -1,6 +1,6 @@
 package icurves.abstractdual;
 
-import icurves.abstractdescription.AbstractBasicRegion;
+import icurves.description.AbstractBasicRegion;
 
 public class AbstractDualNode {
 

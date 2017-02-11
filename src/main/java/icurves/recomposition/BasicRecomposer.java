@@ -1,7 +1,7 @@
 package icurves.recomposition;
 
-import icurves.abstractdescription.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.AbstractCurve;
 import icurves.abstractdescription.AbstractDescription;
 import icurves.decomposition.DecompositionStep;
 import org.apache.logging.log4j.LogManager;
@@ -92,80 +92,82 @@ public class BasicRecomposer implements Recomposer {
     protected RecompositionStep recomposeStep(DecompositionStep decompStep, RecompositionStep previous,
             Map<AbstractBasicRegion, AbstractBasicRegion> matchedZones) {
 
-        log.trace("Matched Zones: " + matchedZones);
+        throw new UnsupportedOperationException("BasicRecomposer");
 
-        // find the resulting zones in the previous step got to
-        List<AbstractBasicRegion> zonesToSplit = new ArrayList<>();
-
-        Map<AbstractBasicRegion, AbstractBasicRegion> zones_moved_during_decomp = decompStep.zonesMoved();
-        Collection<AbstractBasicRegion> zones_after_moved = zones_moved_during_decomp.values();
-
-        Map<AbstractBasicRegion, AbstractBasicRegion> matched_inverse = new HashMap<>();
-
-        Iterator<AbstractBasicRegion> moved_it = zones_after_moved.iterator();
-        while (moved_it.hasNext()) {
-            AbstractBasicRegion moved = moved_it.next();
-            AbstractBasicRegion to_split = matchedZones.get(moved);
-
-            matched_inverse.put(to_split, moved);
-
-            if (to_split != null) {
-                zonesToSplit.add(to_split);
-            } else {
-                throw new RuntimeException("match not found");
-            }
-        }
-
-        log.trace("Matched Inverse: " + matched_inverse);
-
-
-        AbstractDescription from = previous.to();
-        // Partition zonesToSplit
-        List<Cluster> clusters = strategy.makeClusters(zonesToSplit, from);
-
-        clusters.forEach(c -> log.trace("Cluster for recomposition: " + c));
-
-        Set<AbstractBasicRegion> newZoneSet = new TreeSet<>(from.getZones());
-        Set<AbstractCurve> newCurveSet = new TreeSet<>(from.getCurves());
-
-        AbstractCurve removedCurve = decompStep.removed();
-        List<RecompositionData> addedContourData = new ArrayList<>();
-
-        // for each cluster, make a curve with label
-        int i = 0;
-        for (Cluster cluster : clusters) {
-
-            List<AbstractBasicRegion> splitZones = new ArrayList<>();
-            List<AbstractBasicRegion> addedZones = new ArrayList<>();
-
-            AbstractCurve newCurve = (i > 0) ? removedCurve.split() : new AbstractCurve(removedCurve.getLabel());
-
-            //AbstractCurve newCurve = new AbstractCurve(removedCurve.getLabel());
-            newCurveSet.add(newCurve);
-
-            for (AbstractBasicRegion z : cluster.zones()) {
-                splitZones.add(z);
-                AbstractBasicRegion new_zone = z.moveInside(newCurve);
-
-                newZoneSet.add(new_zone);
-                addedZones.add(new_zone);
-
-                AbstractBasicRegion decomp_z = matched_inverse.get(z);
-
-                // TODO: adhoc solves problem but what does it do?
-                if (decomp_z == null) {
-                    decomp_z = z;
-                }
-
-                matchedZones.put(decomp_z.moveInside(removedCurve), new_zone);
-            }
-
-            addedContourData.add(new RecompositionData(newCurve, splitZones, addedZones));
-            i++;
-        }
-
-        AbstractDescription to = new AbstractDescription(newCurveSet, newZoneSet);
-
-        return new RecompositionStep(from, to, addedContourData);
+//        log.trace("Matched Zones: " + matchedZones);
+//
+//        // find the resulting zones in the previous step got to
+//        List<AbstractBasicRegion> zonesToSplit = new ArrayList<>();
+//
+//        Map<AbstractBasicRegion, AbstractBasicRegion> zones_moved_during_decomp = decompStep.zonesMoved();
+//        Collection<AbstractBasicRegion> zones_after_moved = zones_moved_during_decomp.values();
+//
+//        Map<AbstractBasicRegion, AbstractBasicRegion> matched_inverse = new HashMap<>();
+//
+//        Iterator<AbstractBasicRegion> moved_it = zones_after_moved.iterator();
+//        while (moved_it.hasNext()) {
+//            AbstractBasicRegion moved = moved_it.next();
+//            AbstractBasicRegion to_split = matchedZones.get(moved);
+//
+//            matched_inverse.put(to_split, moved);
+//
+//            if (to_split != null) {
+//                zonesToSplit.add(to_split);
+//            } else {
+//                throw new RuntimeException("match not found");
+//            }
+//        }
+//
+//        log.trace("Matched Inverse: " + matched_inverse);
+//
+//
+//        AbstractDescription from = previous.to();
+//        // Partition zonesToSplit
+//        List<Cluster> clusters = strategy.makeClusters(zonesToSplit, from);
+//
+//        clusters.forEach(c -> log.trace("Cluster for recomposition: " + c));
+//
+//        Set<AbstractBasicRegion> newZoneSet = new TreeSet<>(from.getZones());
+//        Set<AbstractCurve> newCurveSet = new TreeSet<>(from.getCurves());
+//
+//        AbstractCurve removedCurve = decompStep.removed();
+//        List<RecompositionData> addedContourData = new ArrayList<>();
+//
+//        // for each cluster, make a curve with label
+//        int i = 0;
+//        for (Cluster cluster : clusters) {
+//
+//            List<AbstractBasicRegion> splitZones = new ArrayList<>();
+//            List<AbstractBasicRegion> addedZones = new ArrayList<>();
+//
+//            AbstractCurve newCurve = (i > 0) ? removedCurve.split() : new AbstractCurve(removedCurve.getLabel());
+//
+//            //AbstractCurve newCurve = new AbstractCurve(removedCurve.getLabel());
+//            newCurveSet.add(newCurve);
+//
+//            for (AbstractBasicRegion z : cluster.zones()) {
+//                splitZones.add(z);
+//                AbstractBasicRegion new_zone = z.moveInside(newCurve);
+//
+//                newZoneSet.add(new_zone);
+//                addedZones.add(new_zone);
+//
+//                AbstractBasicRegion decomp_z = matched_inverse.get(z);
+//
+//                // TODO: adhoc solves problem but what does it do?
+//                if (decomp_z == null) {
+//                    decomp_z = z;
+//                }
+//
+//                matchedZones.put(decomp_z.moveInside(removedCurve), new_zone);
+//            }
+//
+//            addedContourData.add(new RecompositionData(newCurve, splitZones, addedZones));
+//            i++;
+//        }
+//
+//        AbstractDescription to = new AbstractDescription(newCurveSet, newZoneSet);
+//
+//        return new RecompositionStep(from, to, addedContourData);
     }
 }

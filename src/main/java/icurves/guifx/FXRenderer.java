@@ -1,6 +1,6 @@
 package icurves.guifx;
 
-import icurves.abstractdescription.AbstractCurve;
+import icurves.description.AbstractCurve;
 import icurves.concrete.*;
 import icurves.graph.EulerDualGraph;
 import javafx.application.Platform;
