@@ -4,7 +4,7 @@ import icurves.CurvesApp;
 import icurves.description.Description;
 import icurves.concrete.ConcreteDiagram;
 import icurves.diagram.Curve;
-import icurves.concrete.HamiltonianDiagramCreator;
+import icurves.diagram.DiagramCreator;
 import icurves.description.AbstractCurve;
 import icurves.graph.EulerDualNode;
 import icurves.graph.MED;
@@ -279,7 +279,7 @@ public class Controller {
 
         private long generationTime;
 
-        private HamiltonianDiagramCreator newCreator;
+        private DiagramCreator newCreator;
 
         private double fieldSize = 4000.0;
 
@@ -302,7 +302,7 @@ public class Controller {
             Platform.runLater(renderer::clearRenderer);
 
             // else do Hamiltonian
-            newCreator = new HamiltonianDiagramCreator(settings);
+            newCreator = new DiagramCreator(settings);
 
             newCreator.getCurveToContour().addListener((MapChangeListener<? super AbstractCurve, ? super Curve>) change -> {
                 if (change.wasAdded()) {

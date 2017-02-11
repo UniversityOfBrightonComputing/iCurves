@@ -4,6 +4,7 @@ import icurves.CurvesApp;
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
 import icurves.diagram.Curve;
+import icurves.diagram.DiagramCreator;
 import icurves.guifx.SettingsController;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -29,7 +30,7 @@ public class ConcreteZone {
 
     private static final Logger log = LogManager.getLogger(ConcreteZone.class);
 
-    private static final double RADIUS_STEP = HamiltonianDiagramCreator.BASE_CURVE_RADIUS / 20;
+    private static final double RADIUS_STEP = DiagramCreator.BASE_CURVE_RADIUS / 20;
     private static final int SCAN_STEP = (int) RADIUS_STEP / 4;
 
     /**
@@ -188,8 +189,8 @@ public class ConcreteZone {
         int radius = (int) ((width < height ? width : height) * 0.45);
 
         // limit max radius
-        if (radius > HamiltonianDiagramCreator.BASE_CURVE_RADIUS) {
-            radius = (int) HamiltonianDiagramCreator.BASE_CURVE_RADIUS;
+        if (radius > DiagramCreator.BASE_CURVE_RADIUS) {
+            radius = (int) DiagramCreator.BASE_CURVE_RADIUS;
         }
 
         int scanStep = SCAN_STEP;

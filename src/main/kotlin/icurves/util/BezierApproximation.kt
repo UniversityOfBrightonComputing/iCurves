@@ -1,4 +1,4 @@
-package icurves.concrete
+package icurves.util
 
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
@@ -15,9 +15,11 @@ import java.util.*
  */
 object BezierApproximation {
 
-    //private val SEGMENT_INC = 0.1
-
-    fun pathThruPoints(points: MutableList<Point2D>, smoothFactor: Int, closedCycle: Boolean = true, z: Double = .5, angleFactor: Double = .75): List<Path> {
+    fun pathThruPoints(points: MutableList<Point2D>,
+                       smoothFactor: Int,
+                       closedCycle: Boolean = true,
+                       z: Double = 0.5,
+                       angleFactor: Double = 0.75): List<Path> {
 
         if (closedCycle)
             points.add(points[0])

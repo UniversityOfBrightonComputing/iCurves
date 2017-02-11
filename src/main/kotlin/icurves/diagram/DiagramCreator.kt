@@ -1,5 +1,9 @@
-package icurves.concrete
+package icurves.diagram
 
+import icurves.concrete.CircleCurve
+import icurves.concrete.ConcreteZone
+import icurves.concrete.PathCurve
+import icurves.concrete.PolygonCurve
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.description.Description
@@ -8,6 +12,7 @@ import icurves.diagram.Curve
 import icurves.graph.MED
 import icurves.guifx.SettingsController
 import icurves.recomposition.BetterBasicRecomposer
+import icurves.util.BezierApproximation
 import icurves.util.CannotDrawException
 import icurves.util.Profiler
 import javafx.collections.FXCollections
@@ -25,10 +30,10 @@ import java.util.*
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-class HamiltonianDiagramCreator(val settings: SettingsController) {
+class DiagramCreator(val settings: SettingsController) {
 
     companion object {
-        private val log = LogManager.getLogger(HamiltonianDiagramCreator::class.java)
+        private val log = LogManager.getLogger(DiagramCreator::class.java)
 
         @JvmField val BASE_CURVE_RADIUS = 1500.0
     }
@@ -195,33 +200,6 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
 
         concreteShadedZones.addAll(shaded.map { ConcreteZone(it, curveToContour) })
     }
-
-    /**
-     * Creates a concrete zone out of an abstract zone.
-     *
-     * @param zone the abstract zone
-     * @return the concrete zone
-     */
-//    private fun makeConcreteZone(zone: AbstractBasicRegion): ConcreteZone {
-//        val includingCircles = ArrayList<Curve>()
-//        val excludingCircles = ArrayList<Curve>(curveToContour.values)
-//
-//        for (curve in zone.inSet) {
-//            val contour = curveToContour[curve]
-//
-//            excludingCircles.remove(contour)
-//            includingCircles.add(contour!!)
-//        }
-//
-//        val cz = ConcreteZone(zone, includingCircles, excludingCircles)
-//
-//        // TODO: make global bbox
-//        cz.bbox = javafx.scene.shape.Rectangle(10000.0, 10000.0)
-//        cz.bbox.translateX = -3000.0
-//        cz.bbox.translateY = -3000.0
-//
-//        return cz
-//    }
 
     /**
      * Needs to be generated every time because contours change zones.
