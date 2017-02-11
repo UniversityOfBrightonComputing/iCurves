@@ -2,7 +2,7 @@ package icurves.decomposition;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,7 +19,7 @@ public class BasicDecomposer implements Decomposer {
     }
 
     @Override
-    public List<DecompositionStep> decompose(AbstractDescription ad) {
+    public List<DecompositionStep> decompose(Description ad) {
 //        if (ad.getNumZones() <= 0) {
 //            throw new IllegalArgumentException("Abstraction description is empty: " + ad.toString());
 //        }
@@ -50,7 +50,7 @@ public class BasicDecomposer implements Decomposer {
         return result;
     }
 
-    private DecompositionStep takeStep(AbstractDescription ad, AbstractCurve curve) {
+    private DecompositionStep takeStep(Description ad, AbstractCurve curve) {
         Set<AbstractCurve> contours = new TreeSet<>(ad.getCurves());
         contours.remove(curve);
 
@@ -66,7 +66,7 @@ public class BasicDecomposer implements Decomposer {
             }
         }
 
-        AbstractDescription targetAD = new AbstractDescription(contours, zones);
+        Description targetAD = new Description(contours, zones);
         return new DecompositionStep(ad, targetAD, zonesMoved, curve);
     }
 }

@@ -1,6 +1,6 @@
 package icurves.decomposition;
 
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public interface Decomposer {
      * @param description the abstract description
      * @return list of steps
      */
-    List<DecompositionStep> decompose(AbstractDescription description);
+    List<DecompositionStep> decompose(Description description);
 }

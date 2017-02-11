@@ -2,7 +2,7 @@ package icurves.concrete;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import icurves.geometry.Rectangle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a diagram at the concrete level.
- * Technically, this is a concrete form of AbstractDescription.
+ * Technically, this is a concrete form of Description.
  */
 public class ConcreteDiagram {
 
@@ -23,12 +23,12 @@ public class ConcreteDiagram {
     private final List<PathContour> contours;
     private final List<ConcreteZone> shadedZones, allZones;
 
-    private final AbstractDescription original, actual;
+    private final Description original, actual;
     private final Map<AbstractCurve, Contour> curveToContour;
 
     //public final List<Shape> shapes = new ArrayList<>();
 
-    ConcreteDiagram(AbstractDescription original, AbstractDescription actual,
+    ConcreteDiagram(Description original, Description actual,
                     List<CircleContour> circles,
                     Map<AbstractCurve, Contour> curveToContour, int size, PathContour... contours) {
         this.original = original;
@@ -148,7 +148,7 @@ public class ConcreteDiagram {
      *
      * @return original abstract description
      */
-    public AbstractDescription getOriginalDescription() {
+    public Description getOriginalDescription() {
         return original;
     }
 
@@ -157,7 +157,7 @@ public class ConcreteDiagram {
      *
      * @return actual abstract description
      */
-    public AbstractDescription getActualDescription() {
+    public Description getActualDescription() {
         return actual;
     }
 

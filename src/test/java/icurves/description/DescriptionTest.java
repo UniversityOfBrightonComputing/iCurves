@@ -1,6 +1,7 @@
-package icurves.abstractdescription;
+package icurves.description;
 
 import icurves.description.AbstractCurve;
+import icurves.description.Description;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,15 +12,15 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public class AbstractDescriptionTest {
+public class DescriptionTest {
 
-    private AbstractDescription ad1, ad2, ad3;
+    private Description ad1, ad2, ad3;
 
     @Before
     public void setUp() {
-        ad1 = AbstractDescription.from("a ab abc bc ac");
-        ad2 = AbstractDescription.from("abc bc ab ac a");
-        ad3 = AbstractDescription.from("a ad abc bc ac");
+        ad1 = Description.from("a ab abc bc ac");
+        ad2 = Description.from("abc bc ab ac a");
+        ad3 = Description.from("a ad abc bc ac");
     }
 //
 //    @Test
@@ -39,7 +40,7 @@ public class AbstractDescriptionTest {
 //        // Condition 1 holds
 //        //curves.remove(curve2);
 //
-//        new AbstractDescription(curves, zones);
+//        new Description(curves, zones);
 //    }
 //
 //    @Test
@@ -60,7 +61,7 @@ public class AbstractDescriptionTest {
 //
 //        String error = "";
 //        try {
-//            new AbstractDescription(curves, zones);
+//            new Description(curves, zones);
 //        } catch (IllegalArgumentException e) {
 //            error = e.getMessage();
 //        }
@@ -86,7 +87,7 @@ public class AbstractDescriptionTest {
 //
 //        String error = "";
 //        try {
-//            new AbstractDescription(curves, zones);
+//            new Description(curves, zones);
 //        } catch (IllegalArgumentException e) {
 //            error = e.getMessage();
 //        }
@@ -114,7 +115,7 @@ public class AbstractDescriptionTest {
 //
 //        String error = "";
 //        try {
-//            new AbstractDescription(curves, zones);
+//            new Description(curves, zones);
 //        } catch (IllegalArgumentException e) {
 //            error = e.getMessage();
 //        }
@@ -186,7 +187,7 @@ public class AbstractDescriptionTest {
 //        assertEquals(3, actualZonesInC.size());
 //    }
 //
-//    private AbstractCurve getCurve(AbstractDescription description, String label) {
+//    private AbstractCurve getCurve(Description description, String label) {
 //        for (AbstractCurve curve : description.getCurvesUnmodifiable()) {
 //            if (curve.hasLabel(label)) {
 //                return curve;
@@ -197,7 +198,7 @@ public class AbstractDescriptionTest {
 //            + description);
 //    }
 //
-//    private AbstractBasicRegion getZone(AbstractDescription description, String zoneLabel) {
+//    private AbstractBasicRegion getZone(Description description, String zoneLabel) {
 //        Set<AbstractCurve> curves = Arrays.stream(zoneLabel.split(""))
 //                .map(String::valueOf)
 //                .map(curveLabel -> getCurve(description, curveLabel))

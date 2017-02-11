@@ -1,7 +1,7 @@
 package icurves.decomposition;
 
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface DecompositionStrategy {
      * @param description the abstract description
      * @return list of curves to remove
      */
-    List<AbstractCurve> curvesToRemove(AbstractDescription description);
+    List<AbstractCurve> curvesToRemove(Description description);
 }

@@ -21,7 +21,7 @@ public class BasicDecomposerTest {
 //    // the data is then to be parsed and fed into this method for automated testing
 //    @Test
 //    public void decompose() {
-//        List<DecompositionStep> steps = decomposer.decompose(new AbstractDescription("a b ab"));
+//        List<DecompositionStep> steps = decomposer.decompose(new Description("a b ab"));
 //
 //        // a b ab -> b
 //        // b      -> 0
@@ -29,19 +29,19 @@ public class BasicDecomposerTest {
 //
 //        DecompositionStep step1 = steps.get(0);
 //        assertTrue(step1.removed().hasLabel("a"));
-//        assertTrue(step1.from().hasSameAbstractDescription(new AbstractDescription("a b ab")));
-//        assertTrue(step1.to().hasSameAbstractDescription(new AbstractDescription("b")));
+//        assertTrue(step1.from().hasSameAbstractDescription(new Description("a b ab")));
+//        assertTrue(step1.to().hasSameAbstractDescription(new Description("b")));
 //
 //        DecompositionStep step2 = steps.get(1);
 //        assertTrue(step2.removed().hasLabel("b"));
-//        assertTrue(step2.from().hasSameAbstractDescription(new AbstractDescription("b")));
-//        assertTrue(step2.to().hasSameAbstractDescription(new AbstractDescription(" ")));
+//        assertTrue(step2.from().hasSameAbstractDescription(new Description("b")));
+//        assertTrue(step2.to().hasSameAbstractDescription(new Description(" ")));
 //
 //        // the following bit was in the original "manual" test, so need to refactor as above
 //
 ////        System.out.println("example 1: ____________ a b ab ac ad de");
 ////        steplist = decomposer.decompose(
-////                AbstractDescription.makeForTesting("a b ab ac ad de"));
+////                Description.makeForTesting("a b ab ac ad de"));
 ////        for(DecompositionStep step : steplist)
 ////            System.out.println("step : "+step.toDebugString());
 ////
@@ -64,7 +64,7 @@ public class BasicDecomposerTest {
 ////        tsc.add(ca2);
 ////        tsz.add(AbstractBasicRegion.get(tsc)); // in a(2) and b
 ////        tsc.add(ca1);
-////        AbstractDescription ad = new AbstractDescription(tsc, tsz);
+////        Description ad = new Description(tsc, tsz);
 ////        steplist = decomposer.decompose(ad);
 ////        for(DecompositionStep step : steplist)
 ////            System.out.println("step : "+step.toDebugString());

@@ -1,6 +1,6 @@
 package icurves.recomposition;
 
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 
 import java.util.Iterator;
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.List;
  */
 public final class RecompositionStep {
 
-    private final AbstractDescription from;
-    private final AbstractDescription to;
+    private final Description from;
+    private final Description to;
     private final List<RecompositionData> addedContourData;
 
-    public RecompositionStep(AbstractDescription from, AbstractDescription to, List<RecompositionData> addedContourData) {
+    public RecompositionStep(Description from, Description to, List<RecompositionData> addedContourData) {
         this.from = from;
         this.to = to;
         this.addedContourData = addedContourData;
@@ -35,29 +35,29 @@ public final class RecompositionStep {
         if (addedContourData.size() > 1)
             throw new IllegalArgumentException("More than 1 contour data in single step?");
 
-//        String label = addedContourData.get(0).getAddedCurve().getLabel();
+        String label = addedContourData.get(0).getAddedCurve().getLabel();
 //        for (RecompositionData data : addedContourData) {
 //            if (!data.getAddedCurve().matchesLabel(addedContourData.get(0).getAddedCurve()))
 //                throw new IllegalArgumentException("Mixed curves added in recomp");
 //        }
 
-//        if (from.includesLabel(label))
-//            throw new IllegalArgumentException("Added curve already present");
-//        if (!to.includesLabel(label))
-//            throw new IllegalArgumentException("Added curve not present in next description");
+        if (from.includesLabel(label))
+            throw new IllegalArgumentException("Added curve already present");
+        if (!to.includesLabel(label))
+            throw new IllegalArgumentException("Added curve not present in next description");
     }
 
     /**
      * @return abstract description before this step
      */
-    public AbstractDescription from() {
+    public Description from() {
         return from;
     }
 
     /**
      * @return abstract description after this step
      */
-    public AbstractDescription to() {
+    public Description to() {
         return to;
     }
 

@@ -2,14 +2,14 @@ package icurves.decomposition;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 
 import java.util.Map;
 
 public class DecompositionStep {
 
-    private AbstractDescription from;
-    private AbstractDescription to;
+    private Description from;
+    private Description to;
     private Map<AbstractBasicRegion, AbstractBasicRegion> zonesMoved;
 
     /**
@@ -27,8 +27,8 @@ public class DecompositionStep {
      * @param removed the curve that was removed in this step
      */
     public DecompositionStep(
-            AbstractDescription from,
-            AbstractDescription to,
+            Description from,
+            Description to,
             Map<AbstractBasicRegion, AbstractBasicRegion> zonesMoved, // could be derived from from + to
             AbstractCurve removed) // could be derived from from + to
     {
@@ -38,11 +38,11 @@ public class DecompositionStep {
         this.removed = removed;
     }
 
-    public AbstractDescription from() {
+    public Description from() {
         return from;
     }
 
-    public AbstractDescription to() {
+    public Description to() {
         return to;
     }
 

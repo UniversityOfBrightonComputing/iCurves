@@ -2,7 +2,7 @@ package icurves.decomposition;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ public final class DecomposerFactory {
         return DecomposerFactory::getContoursToRemovePiercing;
     }
 
-    private static List<AbstractCurve> getContoursToRemovePiercing(AbstractDescription ad) {
+    private static List<AbstractCurve> getContoursToRemovePiercing(Description ad) {
         List<AbstractCurve> result = new ArrayList<>();
 
         int bestNZ = Integer.MAX_VALUE;
@@ -102,7 +102,7 @@ public final class DecomposerFactory {
         return result;
     }
 
-    private static boolean isPiercingCurve(AbstractCurve ac, AbstractDescription ad) {
+    private static boolean isPiercingCurve(AbstractCurve ac, Description ad) {
         // every abstract basic region in ad which is in ac
         // must have a corresponding abr which is not in ac
         ArrayList<AbstractBasicRegion> zonesInContour = new ArrayList<>();

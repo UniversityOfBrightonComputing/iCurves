@@ -1,7 +1,5 @@
-package icurves.abstractdescription
+package icurves.description
 
-import icurves.description.AbstractBasicRegion
-import icurves.description.AbstractCurve
 import java.util.*
 
 /**
@@ -9,7 +7,7 @@ import java.util.*
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-data class AbstractDescription(private val curvesInternal: Set<AbstractCurve>, private val zonesInternal: Set<AbstractBasicRegion>) {
+data class Description(private val curvesInternal: Set<AbstractCurve>, private val zonesInternal: Set<AbstractBasicRegion>) {
 
     val curves: SortedSet<AbstractCurve>
     val zones: SortedSet<AbstractBasicRegion>
@@ -44,7 +42,7 @@ data class AbstractDescription(private val curvesInternal: Set<AbstractCurve>, p
     override fun toString() = zones.map { it.toString() }.joinToString(",")
 
     companion object {
-        @JvmStatic fun from(informalDescription: String): AbstractDescription {
+        @JvmStatic fun from(informalDescription: String): Description {
             val tmpZones = HashSet<AbstractBasicRegion>()
             tmpZones.add(AbstractBasicRegion.OUTSIDE);
 
@@ -53,7 +51,7 @@ data class AbstractDescription(private val curvesInternal: Set<AbstractCurve>, p
                     .map { AbstractBasicRegion(it.toSet()) }
                     .forEach { tmpZones.add(it) }
 
-            return AbstractDescription(tmpZones.flatMap { it.inSet }.toSet(), tmpZones)
+            return Description(tmpZones.flatMap { it.inSet }.toSet(), tmpZones)
         }
     }
 }

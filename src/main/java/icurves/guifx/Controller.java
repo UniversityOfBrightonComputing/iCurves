@@ -1,7 +1,7 @@
 package icurves.guifx;
 
 import icurves.CurvesApp;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import icurves.concrete.ConcreteDiagram;
 import icurves.concrete.Contour;
 import icurves.concrete.HamiltonianDiagramCreator;
@@ -65,9 +65,9 @@ public class Controller {
 
     private Alert progressDialog = new Alert(Alert.AlertType.INFORMATION);
 
-    private List<AbstractDescription> historyUndo = new ArrayList<>();
-    private List<AbstractDescription> historyRedo = new ArrayList<>();
-    private AbstractDescription currentDescription = AbstractDescription.from("");
+    private List<Description> historyUndo = new ArrayList<>();
+    private List<Description> historyRedo = new ArrayList<>();
+    private Description currentDescription = Description.from("");
 
     public void initialize() {
 
@@ -101,7 +101,7 @@ public class Controller {
         renderer.scaleYProperty().bind(sliderZoom.valueProperty().divide(100));
 
         fieldInput.setOnAction(e -> {
-            AbstractDescription ad = AbstractDescription.from(fieldInput.getText());
+            Description ad = Description.from(fieldInput.getText());
             historyUndo.add(ad);
             visualize(ad);
         });
@@ -144,7 +144,7 @@ public class Controller {
             dialog.showAndWait().ifPresent(buttonType -> {
                 ExampleDiagram diagram = list.getSelectionModel().getSelectedItem();
                 if (diagram != null) {
-                    visualize(AbstractDescription.from(diagram.description));
+                    visualize(Description.from(diagram.description));
                 }
             });
         });
@@ -169,7 +169,7 @@ public class Controller {
     private void open() {
         // TODO: load data in via a dialog
 
-        AbstractDescription ad = AbstractDescription.from("a b c ab bc abd bcd");
+        Description ad = Description.from("a b c ab bc abd bcd");
         visualize(ad);
     }
 
@@ -212,7 +212,7 @@ public class Controller {
         if (historyUndo.size() > 1) {
             historyRedo.add(historyUndo.remove(historyUndo.size() - 1));
 
-            AbstractDescription ad = historyUndo.get(historyUndo.size() - 1);
+            Description ad = historyUndo.get(historyUndo.size() - 1);
             fieldInput.setText(ad.getInformalDescription());
             visualize(ad);
         }
@@ -221,7 +221,7 @@ public class Controller {
     @FXML
     private void redo() {
         if (!historyRedo.isEmpty()) {
-            AbstractDescription ad = historyRedo.remove(historyRedo.size() - 1);
+            Description ad = historyRedo.remove(historyRedo.size() - 1);
             historyUndo.add(ad);
 
             fieldInput.setText(ad.getInformalDescription());
@@ -255,7 +255,7 @@ public class Controller {
         alert.show();
     }
 
-    private void visualize(AbstractDescription description) {
+    private void visualize(Description description) {
         System.out.println("Visualizing: " + description.getInformalDescription());
 
         progressDialog.show();
@@ -275,7 +275,7 @@ public class Controller {
      */
     private class CreateDiagramTask extends Task<ConcreteDiagram> {
 
-        private AbstractDescription description;
+        private Description description;
 
         private long generationTime;
 
@@ -283,7 +283,7 @@ public class Controller {
 
         private double fieldSize = 4000.0;
 
-        public CreateDiagramTask(AbstractDescription description) {
+        public CreateDiagramTask(Description description) {
             this.description = description;
 
             renderer.setPrefSize(fieldSize, fieldSize);

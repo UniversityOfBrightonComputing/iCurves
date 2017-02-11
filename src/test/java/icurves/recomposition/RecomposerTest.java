@@ -19,7 +19,7 @@ public class RecomposerTest {
 //    public void recompose() {
 //        List<DecompositionStep> decompositionSteps = DecomposerFactory
 //                .newDecomposer(DecompositionStrategyType.PIERCED_FIRST)
-//                .decompose(new AbstractDescription("a b ab"));
+//                .decompose(new Description("a b ab"));
 //        List<RecompositionStep> steps = recomposer.recompose(decompositionSteps);
 //
 //        // 0 + b -> b
@@ -27,9 +27,9 @@ public class RecomposerTest {
 //        assertEquals(2, steps.size());
 //
 //        RecompositionStep step1 = steps.get(0);
-//        assertTrue(step1.to().hasSameAbstractDescription(new AbstractDescription("b")));
+//        assertTrue(step1.to().hasSameAbstractDescription(new Description("b")));
 //
 //        RecompositionStep step2 = steps.get(1);
-//        assertTrue(step2.to().hasSameAbstractDescription(new AbstractDescription("a b ab")));
+//        assertTrue(step2.to().hasSameAbstractDescription(new Description("a b ab")));
 //    }
 }

@@ -2,7 +2,7 @@ package icurves.recomposition;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import icurves.abstractdual.AbstractDualGraph;
 import icurves.abstractdual.AbstractDualNode;
 import icurves.decomposition.DecompositionStep;
@@ -58,7 +58,7 @@ public class BetterBasicRecomposer extends BasicRecomposer {
         log.trace("Matched Inverse: " + matched_inverse);
 
 
-        AbstractDescription from = previous.to();
+        Description from = previous.to();
 
         // zonesToSplit, from == in(k,D), D
 
@@ -142,15 +142,15 @@ public class BetterBasicRecomposer extends BasicRecomposer {
 
         addedContourData.add(new RecompositionData(newCurve, splitZones, addedZones));
 
-        AbstractDescription to = new AbstractDescription(newCurveSet, newZoneSet);
+        Description to = new Description(newCurveSet, newZoneSet);
         return new RecompositionStep(from, to, addedContourData);
     }
 
-//    private RecompositionStep makeStep(AbstractCurve removedCurve, List<AbstractBasicRegion> zonesToSplit, AbstractDescription from) {
+//    private RecompositionStep makeStep(AbstractCurve removedCurve, List<AbstractBasicRegion> zonesToSplit, Description from) {
 //
 //    }
 
-    private List<AbstractBasicRegion> fix(List<AbstractBasicRegion> zonesToSplit, AbstractDescription from) {
+    private List<AbstractBasicRegion> fix(List<AbstractBasicRegion> zonesToSplit, Description from) {
         AbstractDualGraph graph = new AbstractDualGraph(new ArrayList<>(from.getZones()));
 
         List<AbstractDualNode> nodesToSplit = new ArrayList<>();

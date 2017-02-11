@@ -1,7 +1,7 @@
 package icurves.recomposition;
 
 import icurves.description.AbstractBasicRegion;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import icurves.abstractdual.AbstractDualEdge;
 import icurves.abstractdual.AbstractDualGraph;
 import icurves.abstractdual.AbstractDualNode;
@@ -92,7 +92,7 @@ public final class RecomposerFactory {
         return result;
     }
 
-    private static List<Cluster> seekDoublePiercings(List<AbstractBasicRegion> zonesToSplit, AbstractDescription ad) {
+    private static List<Cluster> seekDoublePiercings(List<AbstractBasicRegion> zonesToSplit, Description ad) {
         // Look for four-tuples of AbstractBasicRegions which differ by
         // two AbstractCurves - these four-tuples are potential double-clusters
         List<Cluster> result = new ArrayList<>();
@@ -128,7 +128,7 @@ public final class RecomposerFactory {
         return result;
     }
 
-    private static List<Cluster> seekDoublePiercingsExtraZones(List<AbstractBasicRegion> zonesToSplit, AbstractDescription ad) {
+    private static List<Cluster> seekDoublePiercingsExtraZones(List<AbstractBasicRegion> zonesToSplit, Description ad) {
         // Look for four-tuples of AbstractBasicRegions which differ by
         // two AbstractCurves - these four-tuples are potential double-clusters
         List<Cluster> result = new ArrayList<>();

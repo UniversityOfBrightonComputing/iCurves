@@ -1,4 +1,4 @@
-package icurves.abstractdescription;
+package icurves.description;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;

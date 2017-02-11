@@ -2,7 +2,7 @@ package icurves.concrete
 
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
-import icurves.abstractdescription.AbstractDescription
+import icurves.description.Description
 import icurves.decomposition.DecomposerFactory
 import icurves.graph.MED
 import icurves.guifx.SettingsController
@@ -49,7 +49,7 @@ class HamiltonianDiagramCreator(val settings: SettingsController) {
     val debugPoints = arrayListOf<Point2D>()
     val debugShapes = arrayListOf<Shape>()
 
-    fun createDiagram(description: AbstractDescription) {
+    fun createDiagram(description: Description) {
 
         // all we need is decomposition; recomposition is almost no-op
         val dSteps = DecomposerFactory.newDecomposer(settings.decompType).decompose(description)

@@ -1,6 +1,6 @@
 package icurves.util
 
-import icurves.abstractdescription.AbstractDescription
+import icurves.description.Description
 import java.util.*
 
 /**
@@ -10,7 +10,7 @@ import java.util.*
  */
 object Examples {
 
-    val list = ArrayList<Pair<String, AbstractDescription> >()
+    val list = ArrayList<Pair<String, Description> >()
 
     init {
         add("Venn-3", "a b c abc ab ac bc")
@@ -19,6 +19,6 @@ object Examples {
     }
 
     private fun add(name: String, description: String) {
-        list.add(name.to(AbstractDescription.from(description)))
+        list.add(name.to(Description.from(description)))
     }
 }

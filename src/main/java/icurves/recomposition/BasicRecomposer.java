@@ -2,7 +2,7 @@ package icurves.recomposition;
 
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
-import icurves.abstractdescription.AbstractDescription;
+import icurves.description.Description;
 import icurves.decomposition.DecompositionStep;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,8 +76,8 @@ public class BasicRecomposer implements Recomposer {
         matchedZones.put(outside_zone, outside_zone);
         matchedZones.put(new_zone, new_zone);
 
-        AbstractDescription from = decompStep.to();
-        AbstractDescription to = new AbstractDescription(contours, new_zones);
+        Description from = decompStep.to();
+        Description to = new Description(contours, new_zones);
 
         return new RecompositionStep(from, to, added_contour_data);
     }
@@ -121,7 +121,7 @@ public class BasicRecomposer implements Recomposer {
 //        log.trace("Matched Inverse: " + matched_inverse);
 //
 //
-//        AbstractDescription from = previous.to();
+//        Description from = previous.to();
 //        // Partition zonesToSplit
 //        List<Cluster> clusters = strategy.makeClusters(zonesToSplit, from);
 //
@@ -166,7 +166,7 @@ public class BasicRecomposer implements Recomposer {
 //            i++;
 //        }
 //
-//        AbstractDescription to = new AbstractDescription(newCurveSet, newZoneSet);
+//        Description to = new Description(newCurveSet, newZoneSet);
 //
 //        return new RecompositionStep(from, to, addedContourData);
     }

@@ -1,17 +1,13 @@
 package icurves.description
 
-import icurves.description.AbstractCurve
 import java.util.*
 
 /**
- *
+ * An abstract basic region, \beta (element of B), is a set of abstract curves.
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
 data class AbstractBasicRegion(private val inSetInternal: Set<AbstractCurve>) : Comparable<AbstractBasicRegion> {
-
-//    constructor(curves: String) : this(curves.map { AbstractCurve(it.toString()) }.toSet()) {
-//    }
 
     val inSet: SortedSet<AbstractCurve>
 
@@ -38,16 +34,13 @@ data class AbstractBasicRegion(private val inSetInternal: Set<AbstractCurve>) : 
         val biggerSet = if (inSet.size > otherRegion.inSet.size) inSet else otherRegion.inSet
         val smallerSet = if (inSet == biggerSet) otherRegion.inSet else inSet
 
-
         val difference = biggerSet.minus(smallerSet)
         return if (difference.size != 1) Optional.empty() else Optional.of(difference.first())
     }
 
-    override fun equals(other: Any?) = inSet.equals((other as AbstractBasicRegion).inSet)
+    override fun equals(other: Any?) = inSet == (other as AbstractBasicRegion).inSet
 
-    override fun hashCode(): Int {
-        return inSet.hashCode()
-    }
+    override fun hashCode() = inSet.hashCode()
 
     override fun compareTo(other: AbstractBasicRegion): Int {
         if (other.inSet.size < inSet.size) {
@@ -57,15 +50,15 @@ data class AbstractBasicRegion(private val inSetInternal: Set<AbstractCurve>) : 
         }
 
         // same sized in_set
-        val this_it = inSet.iterator()
-        val other_it = other.inSet.iterator()
+        val thisIter = inSet.iterator()
+        val otherIter = other.inSet.iterator()
 
-        while (this_it.hasNext()) {
-            val this_c = this_it.next()
-            val other_c = other_it.next()
-            val comp = this_c.compareTo(other_c)
-            if (comp != 0) {
-                return comp
+        while (thisIter.hasNext()) {
+            val thisCurve = thisIter.next()
+            val otherCurve = otherIter.next()
+            val comparisonResult = thisCurve.compareTo(otherCurve)
+            if (comparisonResult != 0) {
+                return comparisonResult
             }
         }
         return 0
