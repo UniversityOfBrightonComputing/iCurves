@@ -61,7 +61,7 @@ class DiagramCreator(val settings: SettingsController) {
 
         for (i in rSteps.indices) {
             // no duplicates, so just single data
-            val data = rSteps[i].addedContourData[0]
+            val data = rSteps[i].addedCurveData
 
             if (i == 0) {
 

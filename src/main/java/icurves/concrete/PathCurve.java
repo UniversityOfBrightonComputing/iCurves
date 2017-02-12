@@ -8,7 +8,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import math.geom2d.polygon.Polygon2D;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)

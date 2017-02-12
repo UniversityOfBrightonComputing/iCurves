@@ -1,9 +1,9 @@
 package icurves.recomposition;
 
+import icurves.decomposition.DecompositionStep;
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
 import icurves.description.Description;
-import icurves.decomposition.DecompositionStep;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,6 @@ public class BasicRecomposer implements Recomposer {
                                                  Map<AbstractBasicRegion, AbstractBasicRegion> matchedZones) {
 
         AbstractCurve was_removed = decompStep.removed();
-        List<RecompositionData> added_contour_data = new ArrayList<>();
 
         // make a new Abstract Description
         Set<AbstractCurve> contours = new TreeSet<>();
@@ -59,7 +58,6 @@ public class BasicRecomposer implements Recomposer {
         List<AbstractBasicRegion> split_zone = new ArrayList<>();
         List<AbstractBasicRegion> added_zone = new ArrayList<>();
         split_zone.add(outside_zone);
-        added_contour_data.add(new RecompositionData(was_removed, split_zone, added_zone));
 
         contours.add(was_removed);
         AbstractBasicRegion new_zone = new AbstractBasicRegion(contours);
@@ -75,7 +73,7 @@ public class BasicRecomposer implements Recomposer {
         Description from = decompStep.to();
         Description to = new Description(contours, new_zones);
 
-        return new RecompositionStep(from, to, added_contour_data);
+        return new RecompositionStep(from, to, new RecompositionData(was_removed, split_zone, added_zone));
     }
 
     /**
@@ -132,7 +130,6 @@ public class BasicRecomposer implements Recomposer {
         Set<AbstractCurve> newCurveSet = new TreeSet<>(from.getCurves());
 
         AbstractCurve removedCurve = decompStep.removed();
-        List<RecompositionData> addedContourData = new ArrayList<>();
 
         List<AbstractBasicRegion> splitZones = new ArrayList<>();
         List<AbstractBasicRegion> addedZones = new ArrayList<>();
@@ -157,9 +154,7 @@ public class BasicRecomposer implements Recomposer {
             matchedZones.put(decomp_z.moveInside(removedCurve), new_zone);
         }
 
-        addedContourData.add(new RecompositionData(newCurve, splitZones, addedZones));
-
         Description to = new Description(newCurveSet, newZoneSet);
-        return new RecompositionStep(from, to, addedContourData);
+        return new RecompositionStep(from, to, new RecompositionData(newCurve, splitZones, addedZones));
     }
 }

@@ -1,10 +1,10 @@
 package icurves.recomposition;
 
-import icurves.description.AbstractBasicRegion;
-import icurves.description.Description;
 import icurves.abstractdual.AbstractDualEdge;
 import icurves.abstractdual.AbstractDualGraph;
 import icurves.abstractdual.AbstractDualNode;
+import icurves.description.AbstractBasicRegion;
+import icurves.description.Description;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

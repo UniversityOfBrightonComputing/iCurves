@@ -1,16 +1,15 @@
 package icurves.guifx;
 
 import icurves.CurvesApp;
-import icurves.description.Description;
 import icurves.concrete.ConcreteDiagram;
+import icurves.description.AbstractCurve;
+import icurves.description.Description;
 import icurves.diagram.Curve;
 import icurves.diagram.DiagramCreator;
-import icurves.description.AbstractCurve;
 import icurves.graph.EulerDualNode;
 import icurves.graph.MED;
 import icurves.util.Examples;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;

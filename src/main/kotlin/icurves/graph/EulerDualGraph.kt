@@ -1,8 +1,8 @@
 package icurves.graph
 
+import icurves.concrete.ConcreteDiagram
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
-import icurves.concrete.ConcreteDiagram
 import icurves.diagram.Curve
 import icurves.graph.cycles.CycleFinder
 import javafx.geometry.Point2D

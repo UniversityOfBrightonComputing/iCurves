@@ -1,7 +1,10 @@
 package icurves.guifx;
 
+import icurves.concrete.CircleCurve;
+import icurves.concrete.ConcreteDiagram;
+import icurves.concrete.ConcreteZone;
+import icurves.concrete.PathCurve;
 import icurves.description.AbstractCurve;
-import icurves.concrete.*;
 import icurves.diagram.Curve;
 import icurves.graph.EulerDualGraph;
 import javafx.application.Platform;

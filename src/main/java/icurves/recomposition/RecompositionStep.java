@@ -2,9 +2,6 @@ package icurves.recomposition;
 
 import icurves.description.Description;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Single recomposition step.
  * A valid step has following features:
@@ -20,21 +17,14 @@ public final class RecompositionStep {
 
     private final Description from;
     private final Description to;
-    private final List<RecompositionData> addedContourData;
+    private final RecompositionData addedCurveData;
 
-    public RecompositionStep(Description from, Description to, List<RecompositionData> addedContourData) {
+    public RecompositionStep(Description from, Description to, RecompositionData addedCurveData) {
         this.from = from;
         this.to = to;
-        this.addedContourData = addedContourData;
+        this.addedCurveData = addedCurveData;
 
-        if (this.addedContourData.isEmpty()) {
-            throw new IllegalArgumentException("No added curve in recomp");
-        }
-
-        if (addedContourData.size() > 1)
-            throw new IllegalArgumentException("More than 1 contour data in single step?");
-
-        String label = addedContourData.get(0).getAddedCurve().getLabel();
+        String label = addedCurveData.getAddedCurve().getLabel();
 
         if (from.includesLabel(label))
             throw new IllegalArgumentException("Added curve already present");
@@ -43,25 +33,28 @@ public final class RecompositionStep {
     }
 
     /**
-     * @return abstract description before this step
+     * @return description before this step
      */
     public Description from() {
         return from;
     }
 
     /**
-     * @return abstract description after this step
+     * @return description after this step
      */
     public Description to() {
         return to;
     }
 
-    public List<RecompositionData> getAddedContourData() {
-        return addedContourData;
+    /**
+     * @return how the curve was added
+     */
+    public RecompositionData getAddedCurveData() {
+        return addedCurveData;
     }
 
     @Override
     public String toString() {
-        return "R_Step[Data=" + addedContourData + ",From=" + from + " To=" + to + "]";
+        return "R_Step[Data=" + addedCurveData + ",From=" + from + " To=" + to + "]";
     }
 }
