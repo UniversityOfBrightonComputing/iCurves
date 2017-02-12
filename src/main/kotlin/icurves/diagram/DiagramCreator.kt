@@ -10,7 +10,7 @@ import icurves.description.AbstractCurve
 import icurves.description.Description
 import icurves.graph.MED
 import icurves.guifx.SettingsController
-import icurves.recomposition.BasicRecomposer
+import icurves.recomposition.RecomposerFactory
 import icurves.util.BezierApproximation
 import icurves.util.Profiler
 import javafx.collections.FXCollections
@@ -57,10 +57,9 @@ class DiagramCreator(val settings: SettingsController) {
 
         // all we need is decomposition; recomposition is almost no-op
         val dSteps = DecomposerFactory.newDecomposer(settings.decompType).decompose(description)
-        val rSteps = BasicRecomposer().recompose(dSteps)
+        val rSteps = RecomposerFactory.newRecomposer().recompose(dSteps)
 
         for (i in rSteps.indices) {
-            // no duplicates, so just single data
             val data = rSteps[i].addedCurveData
 
             if (i == 0) {

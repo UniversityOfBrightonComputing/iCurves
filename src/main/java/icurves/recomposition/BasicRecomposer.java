@@ -14,6 +14,8 @@ public class BasicRecomposer implements Recomposer {
 
     private static final Logger log = LogManager.getLogger(BasicRecomposer.class);
 
+    BasicRecomposer() {}
+
     @NotNull
     @Override
     public List<RecompositionStep> recompose(List<? extends DecompositionStep> decompSteps) {
@@ -114,8 +116,7 @@ public class BasicRecomposer implements Recomposer {
 
         log.trace("Matched Inverse: " + matched_inverse);
 
-
-        Description from = previous.to();
+        Description from = previous.getTo();
 
         // zonesToSplit, from == in(k,D), D
 
