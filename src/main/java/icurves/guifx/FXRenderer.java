@@ -104,7 +104,7 @@ public class FXRenderer extends Pane {
     }
 
     public void draw(ConcreteDiagram diagram) {
-        Rectangle bbox = toFXRectangle(diagram.getBoundingBox());
+        Rectangle bbox = diagram.getBoundingBox();
         setCanvasSize(bbox.getWidth(), bbox.getHeight());
 
         clearRenderer();
@@ -267,10 +267,6 @@ public class FXRenderer extends Pane {
     public void clearRenderer() {
         rootShadedZones.getChildren().clear();
         g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
-
-    private Rectangle toFXRectangle(icurves.geometry.Rectangle rectangle) {
-        return new Rectangle(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
     public List<Node> getShadedZones() {
