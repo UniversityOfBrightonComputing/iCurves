@@ -6,6 +6,7 @@ import icurves.description.AbstractCurve;
 import icurves.diagram.Curve;
 import icurves.diagram.DiagramCreator;
 import icurves.guifx.SettingsController;
+import icurves.util.Polylabel;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -28,11 +29,6 @@ import java.util.stream.IntStream;
  */
 public class ConcreteZone {
 
-    private static final Logger log = LogManager.getLogger(ConcreteZone.class);
-
-    private static final double RADIUS_STEP = DiagramCreator.BASE_CURVE_RADIUS / 20;
-    private static final int SCAN_STEP = (int) RADIUS_STEP / 4;
-
     /**
      * The abstract basic region of this concrete zone.
      */
@@ -50,8 +46,6 @@ public class ConcreteZone {
 
     public Shape bbox = null;
 
-    private SettingsController settings;
-
     /**
      * Constructs a concrete zone from abstract zone given containing and excluding contours.
      *
@@ -63,8 +57,6 @@ public class ConcreteZone {
         this.zone = zone;
         this.containingCurves = containingCurves;
         this.excludingCurves = excludingCurves;
-
-        settings = CurvesApp.getInstance().getSettings();
 
         // TODO: make global bbox
         bbox = new Rectangle(10000.0, 10000.0);
@@ -84,8 +76,6 @@ public class ConcreteZone {
             excludingCurves.remove(contour);
             containingCurves.add(contour);
         }
-
-        settings = CurvesApp.getInstance().getSettings();
 
         // TODO: make global bbox
         bbox = new Rectangle(10000.0, 10000.0);
@@ -133,8 +123,6 @@ public class ConcreteZone {
         return intersects(other.getShape());
     }
 
-    // TODO: cache shape
-    //private Shape shape = null;
     private Point2D center = null;
 
     /**
@@ -148,15 +136,6 @@ public class ConcreteZone {
         return center;
     }
 
-    // Examples:
-
-    // b h ab ac bd bj cf de fh hi hk hq ik abc
-    // b h l m s ab ac ar bc bd bp cl cn cq cx de hk hq ik mn rz abc bfg
-
-    // Finding zones:
-
-    // a b c d ab ac ad bc abc abd bcd abcd
-
     /**
      * Scans the zone using a smaller radius circle each time
      * until the circle is completely within the zone.
@@ -165,155 +144,17 @@ public class ConcreteZone {
      * @return zone center
      */
     private Point2D computeCenter() {
-        Point2D centroid = computeCentroid();
-        if (centroid != Point2D.ZERO) {
-            System.out.println("Computed centroid: " + centroid);
-            return centroid;
-        }
-
-
-
-
-        //Profiler.INSTANCE.start("Computing center: " + zone);
-
-        Shape shape = getShape();
-        shape.setFill(Color.RED);
-
-        double minX = shape.getLayoutBounds().getMinX();
-        double minY = shape.getLayoutBounds().getMinY();
-        double width = shape.getLayoutBounds().getWidth();
-        double height = shape.getLayoutBounds().getHeight();
-
-        // radius is width/height * 0.5
-        // we use 0.45 for heuristics
-        int radius = (int) ((width < height ? width : height) * 0.45);
-
-        // limit max radius
-        if (radius > DiagramCreator.BASE_CURVE_RADIUS) {
-            radius = (int) DiagramCreator.BASE_CURVE_RADIUS;
-        }
-
-        int scanStep = SCAN_STEP;
-
-        // TODO: we might be better off by computing the approx area
-        // of the part that is outside of this, if large -> then skip the whole line?
-
-        while (true) {
-            if (settings.useCircleApproxCenter()) {
-                Circle circle = new Circle(radius, radius, radius);
-                circle.setStroke(Color.BLACK);
-
-                for (int y = (int) minY + radius; y < minY + height - radius; y += scanStep) {
-                    circle.setCenterY(y);
-
-                    for (int x = (int) minX + radius; x < minX + width - radius; x += scanStep) {
-                        circle.setCenterX(x);
-
-                        // if circle is completely enclosed by this zone
-                        if (Shape.subtract(circle, shape).getLayoutBounds().isEmpty()) {
-
-                            //Profiler.INSTANCE.end("Computing center: " + zone);
-
-                            return new Point2D(x, y);
-                        }
-                    }
-                }
-            } else {
-
-                if (settings.isParallel()) {
-                    final int scanForThisStep = scanStep;
-                    final int radiusForThisStep = radius;
-
-                    Optional<Point2D> maybeCenter = IntStream.range(0, (int)((minY + height - radiusForThisStep*2) / scanForThisStep))
-                            .parallel()
-                            .mapToObj(dy -> {
-                                int y = (int)minY + dy * scanForThisStep;
-
-                                Rectangle rect = new Rectangle(radiusForThisStep*2, radiusForThisStep*2);
-                                rect.setStroke(Color.BLACK);
-                                rect.setY(y);
-
-                                for (int x = (int) minX; x < minX + width - radiusForThisStep*2; x += scanForThisStep) {
-                                    rect.setX(x);
-
-                                    // if square is completely enclosed by this zone
-                                    if (Shape.subtract(rect, shape).getLayoutBounds().isEmpty()) {
-
-                                        return new Point2D(x + radiusForThisStep, y + radiusForThisStep);
-                                    }
-                                }
-
-                                return Point2D.ZERO;
-                            })
-                            .filter(p -> p != Point2D.ZERO)
-                            .findAny();
-
-
-                    if (maybeCenter.isPresent()) {
-                        return maybeCenter.get();
-                    }
-                } else {
-
-                    Rectangle rect = new Rectangle(radius*2, radius*2);
-                    rect.setStroke(Color.BLACK);
-
-                    for (int y = (int) minY; y < minY + height - radius*2; y += scanStep) {
-                        rect.setY(y);
-
-                        for (int x = (int) minX; x < minX + width - radius*2; x += scanStep) {
-                            rect.setX(x);
-
-                            // if square is completely enclosed by this zone
-                            if (Shape.subtract(rect, shape).getLayoutBounds().isEmpty()) {
-
-                                System.out.println("Computed visual: " + new Point2D(x + radius, y + radius));
-                                //Profiler.INSTANCE.end("Computing center: " + zone);
-
-                                return new Point2D(x + radius, y + radius);
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            if (radius <= RADIUS_STEP) {
-                radius -= 5;
-
-                if (scanStep > 10) {
-                    scanStep -= 5;
-                }
-
-                //System.out.println("Checking:" + radius + " scan step: " + scanStep);
-
-            } else {
-                radius -= RADIUS_STEP;
-            }
-
-            if (radius <= 0) {
-                throw new RuntimeException("Cannot find zone center: " + zone);
-            }
-        }
+        return computeVisualCentre();
     }
 
-    private Polygon2D polygonShape = null;
-
-    private Point2D computeCentroid() {
+    private Point2D computeVisualCentre() {
         if (polygonShape == null)
             polygonShape = getPolygonShape();
 
-        math.geom2d.Point2D centroid = polygonShape.centroid();
-
-        try {
-            if (polygonShape.contains(centroid) && !Double.isNaN(centroid.x()) && !Double.isNaN(centroid.y())) {
-                return new Point2D(centroid.x(), centroid.y());
-            } else {
-                return Point2D.ZERO;
-            }
-        } catch (Exception e) {
-            return Point2D.ZERO;
-        }
+        return Polylabel.findCenter(polygonShape);
     }
+
+    private Polygon2D polygonShape = null;
 
     public Polygon2D getPolygonShape() {
         polygonShape = new SimplePolygon2D(new math.geom2d.Point2D(0, 0),

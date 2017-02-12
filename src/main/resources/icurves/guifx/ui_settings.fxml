@@ -14,7 +14,6 @@
 
     <VBox spacing="5" alignment="CENTER_LEFT">
 
-        <CheckBox fx:id="cbTwoStep" text="Use 2-step algorithm" selected="false" />
         <CheckBox fx:id="cbParallel" text="Use multiple threads (faster)" selected="false" />
 
 
@@ -49,8 +48,6 @@
         </HBox>
 
         <CheckBox fx:id="cbShowMED" text="Show final modified Euler dual (slower)" selected="true" />
-
-        <CheckBox fx:id="cbUseCircleApprox" text="Use circle approximation for zone centers (slower)" selected="false" />
 
         <Separator orientation="HORIZONTAL" />
 

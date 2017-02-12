@@ -16,13 +16,6 @@ public class SettingsController {
     public Map<Object, Object> globalMap = new HashMap<>();
 
     @FXML
-    private CheckBox cbTwoStep;
-
-    public boolean isTwoStep() {
-        return cbTwoStep.isSelected();
-    }
-
-    @FXML
     private CheckBox cbParallel;
 
     public boolean isParallel() {
@@ -62,13 +55,6 @@ public class SettingsController {
 
     public boolean showMED() {
         return cbShowMED.isSelected();
-    }
-
-    @FXML
-    private CheckBox cbUseCircleApprox;
-
-    public boolean useCircleApproxCenter() {
-        return cbUseCircleApprox.isSelected();
     }
 
     // TODO: hardcoded
