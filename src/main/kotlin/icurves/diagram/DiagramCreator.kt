@@ -1,13 +1,13 @@
 package icurves.diagram
 
-import icurves.concrete.CircleCurve
 import icurves.concrete.ConcreteZone
 import icurves.concrete.PathCurve
-import icurves.concrete.PolygonCurve
+import icurves.diagram.curve.PolygonCurve
 import icurves.decomposition.DecomposerFactory
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.description.Description
+import icurves.diagram.curve.CircleCurve
 import icurves.graph.MED
 import icurves.guifx.SettingsController
 import icurves.recomposition.RecomposerFactory
@@ -65,7 +65,7 @@ class DiagramCreator(val settings: SettingsController) {
             if (i == 0) {
 
                 // base case 1 curve
-                val contour = CircleCurve(BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve(data.addedCurve, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)
@@ -73,7 +73,7 @@ class DiagramCreator(val settings: SettingsController) {
             } else if (i == 1) {
 
                 // base case 2 curves
-                val contour = CircleCurve((BASE_CURVE_RADIUS + 0) * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve(data.addedCurve, (BASE_CURVE_RADIUS + 0) * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)
@@ -81,7 +81,7 @@ class DiagramCreator(val settings: SettingsController) {
             } else if (i == 2) {
 
                 // base case 3 curves
-                val contour = CircleCurve((BASE_CURVE_RADIUS + 0) * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS, data.addedCurve)
+                val contour = CircleCurve(data.addedCurve, (BASE_CURVE_RADIUS + 0) * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS)
                 curveToContour[data.addedCurve] = contour
 
                 abstractZones.addAll(data.newZones)

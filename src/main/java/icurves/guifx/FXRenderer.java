@@ -1,12 +1,11 @@
 package icurves.guifx;
 
-import icurves.concrete.CircleCurve;
 import icurves.concrete.ConcreteDiagram;
 import icurves.concrete.ConcreteZone;
 import icurves.concrete.PathCurve;
 import icurves.description.AbstractCurve;
 import icurves.diagram.Curve;
-import icurves.graph.EulerDualGraph;
+import icurves.diagram.curve.CircleCurve;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -86,21 +85,6 @@ public class FXRenderer extends Pane {
     public void setCanvasSize(double w, double h) {
         canvas.setWidth(w);
         canvas.setHeight(h);
-    }
-
-    public void draw(ConcreteDiagram diagram, boolean showDual) {
-        draw(diagram);
-
-        if (!showDual) {
-            return;
-        }
-
-        EulerDualGraph dual = new EulerDualGraph(diagram);
-        drawPoints(dual.getNodes().stream().map(n -> n.getZone().getCenter()).collect(Collectors.toList()));
-        dual.getEdges().forEach(e -> {
-            e.getCurve().setStroke(Color.RED);
-            rootSceneGraph.getChildren().addAll(e.getCurve());
-        });
     }
 
     public void draw(ConcreteDiagram diagram) {
