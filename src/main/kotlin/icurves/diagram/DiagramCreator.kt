@@ -4,16 +4,14 @@ import icurves.concrete.CircleCurve
 import icurves.concrete.ConcreteZone
 import icurves.concrete.PathCurve
 import icurves.concrete.PolygonCurve
+import icurves.decomposition.DecomposerFactory
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.description.Description
-import icurves.decomposition.DecomposerFactory
-import icurves.diagram.Curve
 import icurves.graph.MED
 import icurves.guifx.SettingsController
-import icurves.recomposition.BetterBasicRecomposer
+import icurves.recomposition.BasicRecomposer
 import icurves.util.BezierApproximation
-import icurves.util.CannotDrawException
 import icurves.util.Profiler
 import javafx.collections.FXCollections
 import javafx.geometry.Point2D
@@ -59,7 +57,7 @@ class DiagramCreator(val settings: SettingsController) {
 
         // all we need is decomposition; recomposition is almost no-op
         val dSteps = DecomposerFactory.newDecomposer(settings.decompType).decompose(description)
-        val rSteps = BetterBasicRecomposer(null).recompose(dSteps)
+        val rSteps = BasicRecomposer().recompose(dSteps)
 
         for (i in rSteps.indices) {
             // no duplicates, so just single data
@@ -99,7 +97,7 @@ class DiagramCreator(val settings: SettingsController) {
                         data.splitZones
                 )
                         // if the rest of the app worked properly, this will never happen because there is >= 1 Hamiltonian cycles
-                .orElseThrow { CannotDrawException("Failed to find cycle") }
+                .orElseThrow { RuntimeException("Failed to find cycle") }
 
                 //var curve: Curve = PathCurve(data.addedCurve, cycle.path)
 

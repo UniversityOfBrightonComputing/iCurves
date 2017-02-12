@@ -8,8 +8,6 @@ import icurves.diagram.DiagramCreator;
 import icurves.description.AbstractCurve;
 import icurves.graph.EulerDualNode;
 import icurves.graph.MED;
-import icurves.util.ExampleData;
-import icurves.util.ExampleDiagram;
 import icurves.util.Examples;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -130,26 +128,26 @@ public class Controller {
 
             menuDiagrams.getItems().addAll(item);
         });
-
-        MenuItem itemExamples = new MenuItem("Examples");
-        itemExamples.setOnAction(e -> {
-            Alert dialog = new Alert(Alert.AlertType.INFORMATION);
-
-            ListView<ExampleDiagram> list = new ListView<>(FXCollections.observableArrayList(ExampleData.exampleDiagrams));
-
-            ScrollPane scrollPane = new ScrollPane(list);
-
-            dialog.getDialogPane().setContent(scrollPane);
-
-            dialog.showAndWait().ifPresent(buttonType -> {
-                ExampleDiagram diagram = list.getSelectionModel().getSelectedItem();
-                if (diagram != null) {
-                    visualize(Description.from(diagram.description));
-                }
-            });
-        });
-
-        menuDiagrams.getItems().addAll(itemExamples);
+//
+//        MenuItem itemExamples = new MenuItem("Examples");
+//        itemExamples.setOnAction(e -> {
+//            Alert dialog = new Alert(Alert.AlertType.INFORMATION);
+//
+//            ListView<ExampleDiagram> list = new ListView<>(FXCollections.observableArrayList(ExampleData.exampleDiagrams));
+//
+//            ScrollPane scrollPane = new ScrollPane(list);
+//
+//            dialog.getDialogPane().setContent(scrollPane);
+//
+//            dialog.showAndWait().ifPresent(buttonType -> {
+//                ExampleDiagram diagram = list.getSelectionModel().getSelectedItem();
+//                if (diagram != null) {
+//                    visualize(Description.from(diagram.description));
+//                }
+//            });
+//        });
+//
+//        menuDiagrams.getItems().addAll(itemExamples);
     }
 
     @FXML

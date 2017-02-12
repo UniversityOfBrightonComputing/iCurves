@@ -1,13 +1,12 @@
 package icurves.graph
 
 import icurves.CurvesApp
+import icurves.concrete.ConcreteZone
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
-import icurves.concrete.ConcreteZone
 import icurves.diagram.Curve
 import icurves.graph.cycles.CycleFinder
 import icurves.guifx.SettingsController
-import icurves.util.CannotDrawException
 import icurves.util.Converter
 import icurves.util.Profiler
 import javafx.geometry.Point2D
@@ -265,7 +264,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
 
         // we failed to find the correct spot
         if (safetyCount == 500) {
-            throw CannotDrawException("Failed to add EGD edge: ${node1.zone} - ${node2.zone}")
+            throw RuntimeException("Failed to add EGD edge: ${node1.zone} - ${node2.zone}")
         }
 
         return EulerDualEdge(node1, node2, q)

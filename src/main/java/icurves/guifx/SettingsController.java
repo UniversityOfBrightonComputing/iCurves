@@ -1,7 +1,6 @@
 package icurves.guifx;
 
 import icurves.decomposition.DecompositionStrategyType;
-import icurves.recomposition.RecompositionStrategyType;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -75,10 +74,5 @@ public class SettingsController {
     // TODO: hardcoded
     public DecompositionStrategyType getDecompType() {
         return DecompositionStrategyType.INNERMOST;
-    }
-
-    // TODO: hardcoded
-    public RecompositionStrategyType getRecompType() {
-        return RecompositionStrategyType.DOUBLY_PIERCED_EXTRA_ZONES;
     }
 }

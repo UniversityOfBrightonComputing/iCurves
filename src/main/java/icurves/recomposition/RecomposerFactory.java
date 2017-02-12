@@ -23,22 +23,22 @@ public final class RecomposerFactory {
 
     private static Map<Cluster, Integer> clusters = new HashMap<>();
 
-    public static Recomposer newRecomposer(RecompositionStrategyType type) {
-        clusters.clear();
-
-        switch (type) {
-            case NESTED:
-                return new BasicRecomposer(nested());
-            case SINGLY_PIERCED:
-                return new BasicRecomposer(singlyPierced());
-            case DOUBLY_PIERCED:
-                return new BasicRecomposer(doublyPierced());
-            case DOUBLY_PIERCED_EXTRA_ZONES:
-                return new BasicRecomposer(doublyPiercedExtraZones());
-            default:
-                throw new IllegalArgumentException("Unknown strategy type: " + type);
-        }
-    }
+//    public static Recomposer newRecomposer(RecompositionStrategyType type) {
+//        clusters.clear();
+//
+//        switch (type) {
+//            case NESTED:
+//                return new BasicRecomposer(nested());
+//            case SINGLY_PIERCED:
+//                return new BasicRecomposer(singlyPierced());
+//            case DOUBLY_PIERCED:
+//                return new BasicRecomposer(doublyPierced());
+//            case DOUBLY_PIERCED_EXTRA_ZONES:
+//                return new BasicRecomposer(doublyPiercedExtraZones());
+//            default:
+//                throw new IllegalArgumentException("Unknown strategy type: " + type);
+//        }
+//    }
 
     private static RecompositionStrategy nested() {
         return (zonesToSplit, ad) -> zonesToSplit.stream()
