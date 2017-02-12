@@ -3,6 +3,7 @@ package icurves.concrete;
 import icurves.description.AbstractBasicRegion;
 import icurves.description.AbstractCurve;
 import icurves.description.Description;
+import icurves.diagram.BasicRegion;
 import icurves.diagram.Curve;
 import icurves.diagram.curve.CircleCurve;
 import icurves.diagram.curve.PathCurve;
@@ -27,7 +28,7 @@ public class ConcreteDiagram {
     private final Rectangle box;
     private final List<CircleCurve> circles;
     private final List<PathCurve> contours;
-    private final List<ConcreteZone> shadedZones, allZones;
+    private final List<BasicRegion> shadedZones, allZones;
 
     private final Description original, actual;
     private final Map<AbstractCurve, Curve> curveToContour;
@@ -65,8 +66,8 @@ public class ConcreteDiagram {
      *
      * @return list of shaded zones
      */
-    private List<ConcreteZone> createShadedZones() {
-        List<ConcreteZone> result = actual.getZones()
+    private List<BasicRegion> createShadedZones() {
+        List<BasicRegion> result = actual.getZones()
                 .stream()
                 .filter(zone -> !original.includesZone(zone))
                 .map(this::makeConcreteZone)
@@ -83,7 +84,7 @@ public class ConcreteDiagram {
      * @param zone the abstract zone
      * @return the concrete zone
      */
-    private ConcreteZone makeConcreteZone(AbstractBasicRegion zone) {
+    private BasicRegion makeConcreteZone(AbstractBasicRegion zone) {
         List<Curve> includingCircles = new ArrayList<>();
         List<Curve> excludingCircles = new ArrayList<>(circles);
         excludingCircles.addAll(contours);
@@ -95,8 +96,8 @@ public class ConcreteDiagram {
             includingCircles.add(contour);
         }
 
-        ConcreteZone cz = new ConcreteZone(zone, includingCircles, excludingCircles);
-        cz.bbox = new javafx.scene.shape.Rectangle(box.getWidth(), box.getHeight());
+        BasicRegion cz = new BasicRegion(zone, includingCircles, excludingCircles);
+        //cz.bbox = new javafx.scene.shape.Rectangle(box.getWidth(), box.getHeight());
 
         return cz;
     }
@@ -136,7 +137,7 @@ public class ConcreteDiagram {
     /**
      * @return extra zones
      */
-    public List<ConcreteZone> getShadedZones() {
+    public List<BasicRegion> getShadedZones() {
         return shadedZones;
     }
 
@@ -161,19 +162,19 @@ public class ConcreteDiagram {
     /**
      * @return all zones this concrete diagram has
      */
-    public List<ConcreteZone> getAllZones() {
+    public List<BasicRegion> getAllZones() {
         return allZones;
     }
 
-    public List<ConcreteZone> getNormalZones() {
-        List<ConcreteZone> zones = new ArrayList<>(allZones);
+    public List<BasicRegion> getNormalZones() {
+        List<BasicRegion> zones = new ArrayList<>(allZones);
         zones.removeAll(shadedZones);
         return zones;
     }
 
-    public ConcreteZone getOutsideZone() {
+    public BasicRegion getOutsideZone() {
         return allZones.stream()
-                .filter(z -> z.getAbstractZone() == AbstractBasicRegion.OUTSIDE)
+                .filter(z -> z.getAbRegion() == AbstractBasicRegion.OUTSIDE)
                 .findAny()
                 .get();
     }
@@ -226,7 +227,7 @@ public class ConcreteDiagram {
      * @param contour the contour
      * @return zones containing contour
      */
-    public List<ConcreteZone> getZonesContainingContour(CircleCurve contour) {
+    public List<BasicRegion> getZonesContainingContour(CircleCurve contour) {
         return allZones.stream()
                 .filter(zone -> zone.getContainingCurves().contains(contour))
                 .collect(Collectors.toList());

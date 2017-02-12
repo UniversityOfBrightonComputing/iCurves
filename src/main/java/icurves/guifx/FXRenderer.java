@@ -1,7 +1,7 @@
 package icurves.guifx;
 
 import icurves.concrete.ConcreteDiagram;
-import icurves.concrete.ConcreteZone;
+import icurves.diagram.BasicRegion;
 import icurves.diagram.curve.PathCurve;
 import icurves.description.AbstractCurve;
 import icurves.diagram.Curve;
@@ -93,14 +93,14 @@ public class FXRenderer extends Pane {
 
         clearRenderer();
 
-        for (ConcreteZone zone : diagram.getShadedZones())
+        for (BasicRegion zone : diagram.getShadedZones())
             drawShadedZone(zone, bbox);
 
-        List<ConcreteZone> normalZones = new ArrayList<>(diagram.getAllZones());
+        List<BasicRegion> normalZones = new ArrayList<>(diagram.getAllZones());
         normalZones.removeAll(diagram.getShadedZones());
         //normalZones.removeIf(z -> z.getContainingCurves().isEmpty());
 
-        for (ConcreteZone zone : normalZones)
+        for (BasicRegion zone : normalZones)
             drawNormalZone(zone, bbox);
 
         for (CircleCurve contour : diagram.getCircles())
@@ -167,7 +167,7 @@ public class FXRenderer extends Pane {
         }
     }
 
-    private void drawShadedZone(ConcreteZone zone, Rectangle bbox) {
+    private void drawShadedZone(BasicRegion zone, Rectangle bbox) {
         Shape shape = bbox;
 
         for (Curve curve : zone.getContainingCurves()) {
@@ -184,7 +184,7 @@ public class FXRenderer extends Pane {
         rootShadedZones.getChildren().add(shape);
     }
 
-    private void drawNormalZone(ConcreteZone zone, Rectangle bbox) {
+    private void drawNormalZone(BasicRegion zone, Rectangle bbox) {
         //Shape shape = bbox;
 
         Shape shape = zone.getShape();

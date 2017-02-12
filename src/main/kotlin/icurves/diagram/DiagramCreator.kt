@@ -1,6 +1,5 @@
 package icurves.diagram
 
-import icurves.concrete.ConcreteZone
 import icurves.diagram.curve.PathCurve
 import icurves.diagram.curve.PolygonCurve
 import icurves.decomposition.DecomposerFactory
@@ -47,7 +46,7 @@ class DiagramCreator(val settings: SettingsController) {
      * Abstract zones we **currently** occupy.
      */
     private val abstractZones = ArrayList<AbstractBasicRegion>()
-    val concreteShadedZones = ArrayList<ConcreteZone>()
+    val concreteShadedZones = ArrayList<BasicRegion>()
 
     lateinit var modifiedDual: MED
 
@@ -119,9 +118,20 @@ class DiagramCreator(val settings: SettingsController) {
                         val node1 = cycle.nodes[j]
                         val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
 
+                        // this is to enable joining MED ring with internal edges at C2 continuity
+//                        // remove first moveTo
+//                        pathSegments[j].elements.removeAt(0)
+//
+//                        // add to new path
+//                        newPath.elements.addAll(pathSegments[j].elements)
+//
+//                        if (true)
+//                            continue
+
+
                         // check if this is the MED ring segment
                         // No need to check if we use lines?
-                        if (node1.zone.abstractZone == AbstractBasicRegion.OUTSIDE && node2.zone.abstractZone == AbstractBasicRegion.OUTSIDE) {
+                        if (node1.zone.abRegion == AbstractBasicRegion.OUTSIDE && node2.zone.abRegion == AbstractBasicRegion.OUTSIDE) {
                             // j + 1 because we skip the first moveTo
 //                            val arcTo = cycle.path.elements[j + 1] as ArcTo
 //
@@ -160,7 +170,7 @@ class DiagramCreator(val settings: SettingsController) {
 
                         // the new curve segment must pass through the straddled curve
                         // and only through that curve
-                        val abstractCurve = node1.zone.abstractZone.getStraddledContour(node2.zone.abstractZone).get()
+                        val abstractCurve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
 
                         if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
                             // remove first moveTo
@@ -186,7 +196,7 @@ class DiagramCreator(val settings: SettingsController) {
 
                 // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
                 // we also call distinct() to ensure we don't reuse the outside zone more than once
-                abstractZones.addAll(cycle.nodes.map { it.zone.abstractZone.moveInside(data.addedCurve) }.distinct())
+                abstractZones.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
             }
         }
 
@@ -198,7 +208,7 @@ class DiagramCreator(val settings: SettingsController) {
 
         val shaded = abstractZones.minus(description.zones)
 
-        concreteShadedZones.addAll(shaded.map { ConcreteZone(it, curveToContour) })
+        concreteShadedZones.addAll(shaded.map { BasicRegion(it, curveToContour) })
     }
 
     /**
@@ -209,7 +219,7 @@ class DiagramCreator(val settings: SettingsController) {
     private fun createMED() {
         log.trace("Creating MED")
 
-        val concreteZones = abstractZones.map { ConcreteZone(it, curveToContour) }
+        val concreteZones = abstractZones.map { BasicRegion(it, curveToContour) }
 
         modifiedDual = MED(concreteZones, curveToContour)
     }

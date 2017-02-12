@@ -1,9 +1,9 @@
 package icurves.graph
 
 import icurves.CurvesApp
-import icurves.concrete.ConcreteZone
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
+import icurves.diagram.BasicRegion
 import icurves.diagram.Curve
 import icurves.graph.cycles.CycleFinder
 import icurves.guifx.SettingsController
@@ -24,7 +24,7 @@ import java.util.stream.Stream
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-class MED(private val allZones: List<ConcreteZone>, private val allContours: Map<AbstractCurve, Curve>) {
+class MED(private val allZones: List<BasicRegion>, private val allContours: Map<AbstractCurve, Curve>) {
 
     private val log = LogManager.getLogger(javaClass)
 
@@ -74,7 +74,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
          * 4. create extra "arc" edges around the diagram
          */
 
-        val bounds = allZones.map { it.shape.layoutBounds }
+        val bounds = allZones.map { it.getShape().layoutBounds }
 
         val minX = bounds.map { it.minX }.min()
         val minY = bounds.map { it.minY }.min()
@@ -92,7 +92,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
         Profiler.start("Creating MED nodes")
 
         val polygonMED = Converter.toPolygon2D(Converter.makePolygon(radius.toInt(), 16))
-        val outside = ConcreteZone(AbstractBasicRegion.OUTSIDE, allContours)
+        val outside = BasicRegion(AbstractBasicRegion.OUTSIDE, allContours)
 
         val nodesMED = polygonMED.vertices()
                 .map { EulerDualNode(outside, Point2D(it.x(), it.y()).subtract(w/2, h/2)) }
@@ -185,7 +185,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
                 .collect(Collectors.toList()) as MutableList<EulerDualEdge>
     }
 
-    private fun createNode(zone: ConcreteZone): EulerDualNode {
+    private fun createNode(zone: BasicRegion): EulerDualNode {
         return EulerDualNode(zone, zone.center)
     }
 
@@ -229,7 +229,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
 
         // the new curve segment must pass through the straddled curve
         // and only through that curve
-        val curve = node1.zone.abstractZone.getStraddledContour(node2.zone.abstractZone).get()
+        val curve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
 
         log.trace("Searching ${node1.zone} - ${node2.zone} : $curve")
 
@@ -292,7 +292,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
 
         log.trace("Computing MED nodes")
 
-        val outside = ConcreteZone(AbstractBasicRegion.OUTSIDE, allContours)
+        val outside = BasicRegion(AbstractBasicRegion.OUTSIDE, allContours)
 
         var stream = Stream.of(*nodes.toTypedArray())
 
@@ -325,7 +325,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
                     q.controlY = p1.midpoint(p2).y
 
                     // make "distinct" nodes so that jgrapht doesn't think it's a loop
-                    val node = EulerDualNode(ConcreteZone(AbstractBasicRegion.OUTSIDE, allContours), p2)
+                    val node = EulerDualNode(BasicRegion(AbstractBasicRegion.OUTSIDE, allContours), p2)
 
                     edges.add(EulerDualEdge(it, node, q))
 
@@ -419,7 +419,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
 
             // this ensures that we do not allow same vertices in the cycle
             // unless it's the outside vertex
-            cycle.nodes.groupBy { it.zone.abstractZone.toString() }.forEach {
+            cycle.nodes.groupBy { it.zone.abRegion.toString() }.forEach {
                 if (it.key != "{}" && it.value.size > 1) {
                     log.trace("Discarding cycle because ${it.key} is present ${it.value.size} times")
                     return@filter false
@@ -675,7 +675,7 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
     }
 
     fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): Optional<GraphCycle<EulerDualNode, EulerDualEdge>> {
-        return Optional.ofNullable(cycles.filter { it.nodes.map { it.zone.abstractZone }.containsAll(zonesToSplit) }.firstOrNull())
+        return Optional.ofNullable(cycles.filter { it.nodes.map { it.zone.abRegion }.containsAll(zonesToSplit) }.firstOrNull())
     }
 
     /**
@@ -692,54 +692,3 @@ class MED(private val allZones: List<ConcreteZone>, private val allContours: Map
         return angle
     }
 }
-
-
-// some cubic curve stuff
-//                        println("Failed to find correct control point: ${node1.zone} - ${node2.zone}")
-//
-//
-//                        q.controlX = x
-//                        q.controlY = y
-//
-//                        val c = CubicCurve()
-//                        c.fill = null
-//                        c.stroke = Color.BROWN
-//                        c.startX = q.startX
-//                        c.startY = q.startY
-//                        c.endX = q.endX
-//                        c.endY = q.endY
-//
-//                        val vector = p2.subtract(p1)
-//                        val perpen = Point2D(-vector.y, vector.x).multiply(-1.0).normalize()
-//
-//                        val perpen2 = Point2D(-perpen.y, perpen.x).multiply(-1.0).normalize()
-//
-//                        c.controlX1 = x + perpen.x * 300 + perpen2.x * 300
-//                        c.controlY1 = y + perpen.y * 300 + perpen2.y * 300
-//
-//                        c.controlX2 = x + perpen.x * 300 - perpen2.x * 300
-//                        c.controlY2 = y + perpen.y * 300 - perpen2.y * 300
-//
-//                        // TODO: find algorithm
-//                        c.controlX1 = 300.0
-//                        c.controlY1 = 0.0
-//
-//                        c.controlX2 = 500.0
-//                        c.controlY2 = 50.0
-//
-//                        //edges.add(EulerDualEdge(node1, node2, c))
-
-
-//                            val vector = p1.subtract(arcCenter)
-//
-//                            if (vector.x < 0) {
-//
-//                                if (vector.y < 0) {
-//
-//                                } else {
-//
-//                                }
-//
-//                            } else {
-//
-//                            }
