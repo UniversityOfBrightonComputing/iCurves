@@ -5,6 +5,7 @@ import icurves.description.AbstractCurve;
 import icurves.description.Description;
 import icurves.diagram.Curve;
 import icurves.diagram.curve.CircleCurve;
+import icurves.diagram.curve.PathCurve;
 import javafx.scene.shape.Rectangle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -2,7 +2,7 @@ package icurves.guifx;
 
 import icurves.concrete.ConcreteDiagram;
 import icurves.concrete.ConcreteZone;
-import icurves.concrete.PathCurve;
+import icurves.diagram.curve.PathCurve;
 import icurves.description.AbstractCurve;
 import icurves.diagram.Curve;
 import icurves.diagram.curve.CircleCurve;

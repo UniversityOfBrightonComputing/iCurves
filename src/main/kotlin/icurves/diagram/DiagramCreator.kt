@@ -1,7 +1,7 @@
 package icurves.diagram
 
 import icurves.concrete.ConcreteZone
-import icurves.concrete.PathCurve
+import icurves.diagram.curve.PathCurve
 import icurves.diagram.curve.PolygonCurve
 import icurves.decomposition.DecomposerFactory
 import icurves.description.AbstractBasicRegion
@@ -17,6 +17,7 @@ import javafx.collections.FXCollections
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
 import javafx.scene.shape.ClosePath
+import javafx.scene.shape.LineTo
 import javafx.scene.shape.Path
 import javafx.scene.shape.Shape
 import org.apache.logging.log4j.LogManager
@@ -98,9 +99,9 @@ class DiagramCreator(val settings: SettingsController) {
                         // if the rest of the app worked properly, this will never happen because there is >= 1 Hamiltonian cycles
                 .orElseThrow { RuntimeException("Failed to find cycle") }
 
-                //var curve: Curve = PathCurve(data.addedCurve, cycle.path)
+                var curve: Curve = PathCurve(data.addedCurve, cycle.path)
 
-                var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
+                //var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
 
                 // smooth curves if required
                 if (settings.useSmooth()) {
@@ -121,7 +122,7 @@ class DiagramCreator(val settings: SettingsController) {
                         // check if this is the MED ring segment
                         // No need to check if we use lines?
                         if (node1.zone.abstractZone == AbstractBasicRegion.OUTSIDE && node2.zone.abstractZone == AbstractBasicRegion.OUTSIDE) {
-//                            // j + 1 because we skip the first moveTo
+                            // j + 1 because we skip the first moveTo
 //                            val arcTo = cycle.path.elements[j + 1] as ArcTo
 //
 //                            val start = settings.globalMap[arcTo] as Point2D
@@ -150,16 +151,18 @@ class DiagramCreator(val settings: SettingsController) {
 //                                    println("ALL GOOD")
 //                                }
 //                            }
-//
-//                            newPath.elements.addAll(arcTo)
+
+                            val lineTo = cycle.path.elements[j + 1] as LineTo
+
+                            newPath.elements.addAll(lineTo)
                             continue
                         }
 
                         // the new curve segment must pass through the straddled curve
                         // and only through that curve
-                        val curve = node1.zone.abstractZone.getStraddledContour(node2.zone.abstractZone).get()
+                        val abstractCurve = node1.zone.abstractZone.getStraddledContour(node2.zone.abstractZone).get()
 
-                        if (isOK(pathSegments[j], curve, curveToContour.values.toList())) {
+                        if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
                             // remove first moveTo
                             pathSegments[j].elements.removeAt(0)
 
