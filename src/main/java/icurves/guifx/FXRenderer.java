@@ -1,6 +1,5 @@
 package icurves.guifx;
 
-import icurves.concrete.ConcreteDiagram;
 import icurves.diagram.BasicRegion;
 import icurves.diagram.curve.PathCurve;
 import icurves.description.AbstractCurve;
@@ -85,32 +84,6 @@ public class FXRenderer extends Pane {
     public void setCanvasSize(double w, double h) {
         canvas.setWidth(w);
         canvas.setHeight(h);
-    }
-
-    public void draw(ConcreteDiagram diagram) {
-        Rectangle bbox = diagram.getBoundingBox();
-        setCanvasSize(bbox.getWidth(), bbox.getHeight());
-
-        clearRenderer();
-
-        for (BasicRegion zone : diagram.getShadedZones())
-            drawShadedZone(zone, bbox);
-
-        List<BasicRegion> normalZones = new ArrayList<>(diagram.getAllZones());
-        normalZones.removeAll(diagram.getShadedZones());
-        //normalZones.removeIf(z -> z.getContainingCurves().isEmpty());
-
-        for (BasicRegion zone : normalZones)
-            drawNormalZone(zone, bbox);
-
-        for (CircleCurve contour : diagram.getCircles())
-            drawCircleContour(contour);
-
-        rootSceneGraph.getChildren().clear();
-
-        for (PathCurve contour : diagram.getContours()) {
-            rootSceneGraph.getChildren().addAll(contour.getShape());
-        }
     }
 
     private Set<AbstractCurve> makeCurves(String... curveLabels) {

@@ -1,7 +1,6 @@
 package icurves.guifx;
 
 import icurves.CurvesApp;
-import icurves.concrete.ConcreteDiagram;
 import icurves.description.AbstractCurve;
 import icurves.description.Description;
 import icurves.diagram.Curve;
@@ -261,7 +260,7 @@ public class Controller {
         currentDescription = description;
         int size = (int) Math.min(renderer.getWidth(), renderer.getHeight());
 
-        Task<ConcreteDiagram> task = new CreateDiagramTask(description);
+        Task<Void> task = new CreateDiagramTask(description);
 
         Thread t = new Thread(task, "Diagram Creation Thread");
         t.start();
@@ -270,7 +269,7 @@ public class Controller {
     /**
      * A task of creating a diagram and subsequently drawing it on the screen.
      */
-    private class CreateDiagramTask extends Task<ConcreteDiagram> {
+    private class CreateDiagramTask extends Task<Void> {
 
         private Description description;
 
@@ -293,7 +292,7 @@ public class Controller {
         }
 
         @Override
-        protected ConcreteDiagram call() throws Exception {
+        protected Void call() throws Exception {
             long startTime = System.nanoTime();
 
             Platform.runLater(renderer::clearRenderer);
@@ -321,17 +320,33 @@ public class Controller {
         @Override
         protected void succeeded() {
 
-            ConcreteDiagram diagram = getValue();
+            // draw any debug points
+            newCreator.getDebugPoints().forEach(p -> {
+                Circle point = new Circle(p.getX(), p.getY(), 10, Color.LIGHTSKYBLUE);
 
-            if (diagram != null) {
+                Text coord = new Text((int) p.getX() + "," + (int) p.getY());
+                coord.setTranslateX(p.getX());
+                coord.setTranslateY(p.getY() - 10);
 
-                renderer.draw(diagram);
+                renderer.rootSceneGraph.getChildren().addAll(point, coord);
+            });
 
-            } else {
+            newCreator.getDebugShapes().forEach(shape -> {
+                System.out.println("adding debug info");
+                shape.setFill(Color.RED);
+                shape.setStrokeWidth(5);
+                shape.setStroke(Color.BLUE);
 
-                // draw any debug points
-                newCreator.getDebugPoints().forEach(p -> {
-                    Circle point = new Circle(p.getX(), p.getY(), 10, Color.LIGHTSKYBLUE);
+                renderer.rootSceneGraph.getChildren().addAll(shape);
+            });
+
+            if (settings.showMED()) {
+
+                MED modifiedDual = newCreator.getModifiedDual();
+
+                // draw MED nodes
+                modifiedDual.getNodes().stream().map(EulerDualNode::getPoint).forEach(p -> {
+                    Circle point = new Circle(p.getX(), p.getY(), 10, Color.RED);
 
                     Text coord = new Text((int) p.getX() + "," + (int) p.getY());
                     coord.setTranslateX(p.getX());
@@ -340,50 +355,26 @@ public class Controller {
                     renderer.rootSceneGraph.getChildren().addAll(point, coord);
                 });
 
-                newCreator.getDebugShapes().forEach(shape -> {
-                    System.out.println("adding debug info");
-                    shape.setFill(Color.RED);
-                    shape.setStrokeWidth(5);
-                    shape.setStroke(Color.BLUE);
-
-                    renderer.rootSceneGraph.getChildren().addAll(shape);
-                });
-
-                if (settings.showMED()) {
-
-                    MED modifiedDual = newCreator.getModifiedDual();
-
-                    // draw MED nodes
-                    modifiedDual.getNodes().stream().map(EulerDualNode::getPoint).forEach(p -> {
-                        Circle point = new Circle(p.getX(), p.getY(), 10, Color.RED);
-
-                        Text coord = new Text((int) p.getX() + "," + (int) p.getY());
-                        coord.setTranslateX(p.getX());
-                        coord.setTranslateY(p.getY() - 10);
-
-                        renderer.rootSceneGraph.getChildren().addAll(point, coord);
-                    });
-
-                    // draw MED edges
-                    modifiedDual.getEdges().forEach(e -> {
-                        e.getCurve().setStroke(Color.RED);
-                        e.getCurve().setStrokeWidth(6);
-                        renderer.rootSceneGraph.getChildren().addAll(e.getCurve());
+                // draw MED edges
+                modifiedDual.getEdges().forEach(e -> {
+                    e.getCurve().setStroke(Color.RED);
+                    e.getCurve().setStrokeWidth(6);
+                    renderer.rootSceneGraph.getChildren().addAll(e.getCurve());
 
 //                    e.getCurve().setOnMouseClicked(event -> {
 //                        e.getCurve().setStroke(Color.YELLOW);
 //                    });
-                    });
-                }
-
-                // add shaded zones
-                newCreator.getConcreteShadedZones().forEach(zone -> {
-                    Shape shape = zone.getShape();
-                    shape.setFill(Color.GRAY);
-
-                    renderer.rootShadedZones.getChildren().addAll(shape);
                 });
             }
+
+            // add shaded zones
+            newCreator.getConcreteShadedZones().forEach(zone -> {
+                Shape shape = zone.getShape();
+                shape.setFill(Color.GRAY);
+
+                renderer.rootShadedZones.getChildren().addAll(shape);
+            });
+
 
 //            try {
 //                long startTime = System.nanoTime();
