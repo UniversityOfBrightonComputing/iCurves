@@ -1,15 +1,18 @@
 package icurves.diagram
 
-import icurves.diagram.curve.PathCurve
-import icurves.diagram.curve.PolygonCurve
 import icurves.decomposition.DecomposerFactory
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.description.Description
 import icurves.diagram.curve.CircleCurve
+import icurves.diagram.curve.PathCurve
+import icurves.graph.EulerDualEdge
+import icurves.graph.EulerDualNode
+import icurves.graph.GraphCycle
 import icurves.graph.MED
 import icurves.guifx.SettingsController
 import icurves.recomposition.RecomposerFactory
+import icurves.recomposition.RecompositionData
 import icurves.util.BezierApproximation
 import icurves.util.Profiler
 import javafx.collections.FXCollections
@@ -23,8 +26,9 @@ import org.apache.logging.log4j.LogManager
 import java.util.*
 
 /**
- * Diagram creator that uses Hamiltonian cycles to ensure
- * that any diagram description is drawable.
+ * Diagram creator that uses simple cycles to add curves.
+ * At least 1 Hamiltonian is always present.
+ * This ensures that any description is drawable.
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
@@ -43,10 +47,10 @@ class DiagramCreator(val settings: SettingsController) {
     val curveToContour = FXCollections.observableMap(LinkedHashMap<AbstractCurve, Curve>())
 
     /**
-     * Abstract zones we **currently** occupy.
+     * Abstract basic regions we have processed so far.
      */
-    private val abstractZones = ArrayList<AbstractBasicRegion>()
-    val concreteShadedZones = ArrayList<BasicRegion>()
+    private val abstractRegions = ArrayList<AbstractBasicRegion>()
+    val shadedRegions = ArrayList<BasicRegion>()
 
     lateinit var modifiedDual: MED
 
@@ -62,63 +66,83 @@ class DiagramCreator(val settings: SettingsController) {
         for (i in rSteps.indices) {
             val data = rSteps[i].addedCurveData
 
-            if (i == 0) {
+            val curve = when (i) {
 
-                // base case 1 curve
-                val contour = CircleCurve(data.addedCurve, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
-                curveToContour[data.addedCurve] = contour
+                // 0..2 are base cases for 1..3 curves
+                0 -> CircleCurve(data.addedCurve, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
+                1 -> CircleCurve(data.addedCurve, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
+                2 -> CircleCurve(data.addedCurve, BASE_CURVE_RADIUS * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS)
+                else -> embedCurve(data)
+            }
 
-                abstractZones.addAll(data.newZones)
+            curveToContour[data.addedCurve] = curve
 
-            } else if (i == 1) {
+            if (i < 3) {
+                // this is not entirely correct for say missing regions
+                // a ab b ac c
+                abstractRegions.addAll(data.newZones)
+            }
+        }
 
-                // base case 2 curves
-                val contour = CircleCurve(data.addedCurve, (BASE_CURVE_RADIUS + 0) * 2, BASE_CURVE_RADIUS, BASE_CURVE_RADIUS)
-                curveToContour[data.addedCurve] = contour
+        if (settings.showMED())
+            createMED()
 
-                abstractZones.addAll(data.newZones)
+        log.trace("Generating shaded zones")
 
-            } else if (i == 2) {
+        val shaded = abstractRegions.minus(description.zones)
 
-                // base case 3 curves
-                val contour = CircleCurve(data.addedCurve, (BASE_CURVE_RADIUS + 0) * 1.5, BASE_CURVE_RADIUS * 2, BASE_CURVE_RADIUS)
-                curveToContour[data.addedCurve] = contour
+        shadedRegions.addAll(shaded.map { BasicRegion(it, curveToContour) })
+    }
 
-                abstractZones.addAll(data.newZones)
+    /**
+     * Side-effects:
+     *
+     * 1. creates MED
+     * 2. chooses a cycle
+     * 3. creates a curve
+     * 4. updates abstract regions
+     */
+    private fun embedCurve(data: RecompositionData): Curve {
+        createMED()
 
-            } else {    // evaluating 4th+ curve
+        log.trace("Searching cycle with zones: ${data.splitZones}")
 
-                createMED()
+        val cycle = modifiedDual.computeCycle(
+                data.splitZones
+        ).orElseThrow { RuntimeException("Bug: Failed to find cycle") }
 
-                log.trace("Searching cycle with zones: ${data.splitZones}")
+        var curve = PathCurve(data.addedCurve, cycle.path)
 
-                val cycle = modifiedDual.computeCycle(
-                        data.splitZones
-                )
-                        // if the rest of the app worked properly, this will never happen because there is >= 1 Hamiltonian cycles
-                .orElseThrow { RuntimeException("Failed to find cycle") }
+        //var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
 
-                var curve: Curve = PathCurve(data.addedCurve, cycle.path)
+        if (settings.useSmooth()) {
+            val smoothedPath = smooth(cycle)
 
-                //var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
+            curve = PathCurve(data.addedCurve, smoothedPath)
+        }
 
-                // smooth curves if required
-                if (settings.useSmooth()) {
+        // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
+        // we also call distinct() to ensure we don't reuse the outside zone more than once
+        abstractRegions.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
 
-                    Profiler.start("Smoothing")
+        return curve
+    }
 
-                    val pathSegments = BezierApproximation.pathThruPoints(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
+    private fun smooth(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Path {
+        Profiler.start("Smoothing")
 
-                    val newPath = Path()
+        val pathSegments = BezierApproximation.pathThruPoints(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
 
-                    // add moveTo
-                    newPath.elements.add(cycle.path.elements[0])
+        val newPath = Path()
 
-                    for (j in cycle.nodes.indices) {
-                        val node1 = cycle.nodes[j]
-                        val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
+        // add moveTo
+        newPath.elements.add(cycle.path.elements[0])
 
-                        // this is to enable joining MED ring with internal edges at C2 continuity
+        for (j in cycle.nodes.indices) {
+            val node1 = cycle.nodes[j]
+            val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
+
+            // this is to enable joining MED ring with internal edges at C2 continuity
 //                        // remove first moveTo
 //                        pathSegments[j].elements.removeAt(0)
 //
@@ -129,10 +153,10 @@ class DiagramCreator(val settings: SettingsController) {
 //                            continue
 
 
-                        // check if this is the MED ring segment
-                        // No need to check if we use lines?
-                        if (node1.zone.abRegion == AbstractBasicRegion.OUTSIDE && node2.zone.abRegion == AbstractBasicRegion.OUTSIDE) {
-                            // j + 1 because we skip the first moveTo
+            // check if this is the MED ring segment
+            // No need to check if we use lines?
+            if (node1.zone.abRegion == AbstractBasicRegion.OUTSIDE && node2.zone.abRegion == AbstractBasicRegion.OUTSIDE) {
+                // j + 1 because we skip the first moveTo
 //                            val arcTo = cycle.path.elements[j + 1] as ArcTo
 //
 //                            val start = settings.globalMap[arcTo] as Point2D
@@ -162,53 +186,34 @@ class DiagramCreator(val settings: SettingsController) {
 //                                }
 //                            }
 
-                            val lineTo = cycle.path.elements[j + 1] as LineTo
+                val lineTo = cycle.path.elements[j + 1] as LineTo
 
-                            newPath.elements.addAll(lineTo)
-                            continue
-                        }
+                newPath.elements.addAll(lineTo)
+                continue
+            }
 
-                        // the new curve segment must pass through the straddled curve
-                        // and only through that curve
-                        val abstractCurve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
+            // the new curve segment must pass through the straddled curve
+            // and only through that curve
+            val abstractCurve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
 
-                        if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
-                            // remove first moveTo
-                            pathSegments[j].elements.removeAt(0)
+            if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
+                // remove first moveTo
+                pathSegments[j].elements.removeAt(0)
 
-                            // add to new path
-                            newPath.elements.addAll(pathSegments[j].elements)
-                        } else {
-                            // j + 1 because we skip the first moveTo
-                            newPath.elements.addAll(cycle.path.elements[j + 1])
-                        }
-                    }
-
-                    newPath.fill = Color.TRANSPARENT
-                    newPath.elements.add(ClosePath())
-
-                    curve = PathCurve(data.addedCurve, newPath)
-
-                    Profiler.end("Smoothing")
-                }
-
-                curveToContour[data.addedCurve] = curve
-
-                // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
-                // we also call distinct() to ensure we don't reuse the outside zone more than once
-                abstractZones.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
+                // add to new path
+                newPath.elements.addAll(pathSegments[j].elements)
+            } else {
+                // j + 1 because we skip the first moveTo
+                newPath.elements.addAll(cycle.path.elements[j + 1])
             }
         }
 
-        // create MED for final diagram if required
-        if (settings.showMED())
-            createMED()
+        newPath.fill = Color.TRANSPARENT
+        newPath.elements.add(ClosePath())
 
-        log.trace("Generating shaded zones")
+        Profiler.end("Smoothing")
 
-        val shaded = abstractZones.minus(description.zones)
-
-        concreteShadedZones.addAll(shaded.map { BasicRegion(it, curveToContour) })
+        return newPath
     }
 
     /**
@@ -219,7 +224,7 @@ class DiagramCreator(val settings: SettingsController) {
     private fun createMED() {
         log.trace("Creating MED")
 
-        val concreteZones = abstractZones.map { BasicRegion(it, curveToContour) }
+        val concreteZones = abstractRegions.map { BasicRegion(it, curveToContour) }
 
         modifiedDual = MED(concreteZones, curveToContour)
     }
@@ -256,10 +261,6 @@ class DiagramCreator(val settings: SettingsController) {
 
         return list.isNotEmpty()
     }
-
-
-
-
 
     // 4 nodes can (maybe?) make a nice circle
 

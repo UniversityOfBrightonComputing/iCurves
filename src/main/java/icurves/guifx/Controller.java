@@ -368,7 +368,7 @@ public class Controller {
             }
 
             // add shaded zones
-            newCreator.getConcreteShadedZones().forEach(zone -> {
+            newCreator.getShadedRegions().forEach(zone -> {
                 Shape shape = zone.getShape();
                 shape.setFill(Color.GRAY);
 
