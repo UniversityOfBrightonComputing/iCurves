@@ -143,14 +143,14 @@ class DiagramCreator(val settings: SettingsController) {
             val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
 
             // this is to enable joining MED ring with internal edges at C2 continuity
-//                        // remove first moveTo
-//                        pathSegments[j].elements.removeAt(0)
+            // remove first moveTo
+//            pathSegments[j].elements.removeAt(0)
 //
-//                        // add to new path
-//                        newPath.elements.addAll(pathSegments[j].elements)
+//            // add to new path
+//            newPath.elements.addAll(pathSegments[j].elements)
 //
-//                        if (true)
-//                            continue
+//            if (true)
+//                continue
 
 
             // check if this is the MED ring segment
@@ -186,9 +186,12 @@ class DiagramCreator(val settings: SettingsController) {
 //                                }
 //                            }
 
-                val lineTo = cycle.path.elements[j + 1] as LineTo
 
-                newPath.elements.addAll(lineTo)
+                pathSegments[j].elements.removeAt(0)
+                newPath.elements.addAll(pathSegments[j].elements)
+//                val lineTo = cycle.path.elements[j + 1] as LineTo
+//
+//                newPath.elements.addAll(lineTo)
                 continue
             }
 
