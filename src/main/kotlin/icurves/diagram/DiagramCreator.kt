@@ -118,6 +118,18 @@ class DiagramCreator(val settings: SettingsController) {
         if (settings.useSmooth()) {
             val smoothedPath = smooth(cycle)
 
+//            cycle.nodes.map { it.point }.forEach {
+//                println(it)
+//            }
+
+//            val controlPoints = settings.globalMap["controlPoints"]!! as List<Pair<Point2D, Point2D> >
+//            controlPoints.forEach {
+//                //debugPoints.add(it.first)
+//                //debugPoints.add(it.second)
+//
+//                println("${it.first}, ${it.second}")
+//            }
+
             curve = PathCurve(data.addedCurve, smoothedPath)
         }
 
@@ -131,7 +143,9 @@ class DiagramCreator(val settings: SettingsController) {
     private fun smooth(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Path {
         Profiler.start("Smoothing")
 
-        val pathSegments = BezierApproximation.pathThruPoints(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
+        //val cycle = GraphCycle<EulerDualNode, EulerDualEdge>(cycle2.nodes.reversed(), cycle2.edges)
+
+        val pathSegments = BezierApproximation.smoothPath2(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
 
         val newPath = Path()
 
