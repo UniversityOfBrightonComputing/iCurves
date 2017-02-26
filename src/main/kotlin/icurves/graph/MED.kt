@@ -24,7 +24,7 @@ import java.util.stream.Stream
  *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
-class MED(private val allZones: List<BasicRegion>, private val allContours: Map<AbstractCurve, Curve>) {
+class MED(val allZones: List<BasicRegion>, private val allContours: Map<AbstractCurve, Curve>) {
 
     private val log = LogManager.getLogger(javaClass)
 

@@ -111,24 +111,16 @@ class DiagramCreator(val settings: SettingsController) {
                 data.splitZones
         ).orElseThrow { RuntimeException("Bug: Failed to find cycle") }
 
-        var curve = PathCurve(data.addedCurve, cycle.path)
+        var curve: Curve = PathCurve(data.addedCurve, cycle.path)
 
         //var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
 
-        if (settings.useSmooth()) {
+        if (cycle.nodes.size == 4) {
+            curve = embedDoublePiercing(data.addedCurve, cycle.nodes.map { it.zone })
+        }
+
+        if (settings.useSmooth() && curve !is CircleCurve) {
             val smoothedPath = smooth(cycle)
-
-//            cycle.nodes.map { it.point }.forEach {
-//                println(it)
-//            }
-
-//            val controlPoints = settings.globalMap["controlPoints"]!! as List<Pair<Point2D, Point2D> >
-//            controlPoints.forEach {
-//                //debugPoints.add(it.first)
-//                //debugPoints.add(it.second)
-//
-//                println("${it.first}, ${it.second}")
-//            }
 
             curve = PathCurve(data.addedCurve, smoothedPath)
         }
@@ -138,6 +130,28 @@ class DiagramCreator(val settings: SettingsController) {
         abstractRegions.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
 
         return curve
+    }
+
+    private fun embedDoublePiercing(abstractCurve: AbstractCurve, regions: List<BasicRegion>): Curve {
+        val center = regions.map { it.getPolygonShape().vertices() }
+                .flatten()
+                .groupBy({ it.asInt })
+                // we search for a vertex that is present in all four regions
+                .filter { it.value.size == 4 }
+                .map { Point2D(it.key.getX(), it.key.getY()) }
+                .firstOrNull() ?: throw RuntimeException("Bug: 2-piercing center not found")
+
+//        val radius = regions.map { it.center.distance(center) }
+//                .sorted()
+//                .first()
+
+        val radius = modifiedDual.allZones
+                .minus(regions)
+                .map { it.center.distance(center) }
+                .sorted()
+                .first()
+
+        return CircleCurve(abstractCurve, center.x, center.y, radius / 3)
     }
 
     private fun smooth(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Path {
