@@ -1,6 +1,7 @@
 package icurves.graph
 
 import icurves.CurvesApp
+import icurves.algorithm.EdgeRouter
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.diagram.BasicRegion
@@ -196,36 +197,12 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
     private fun createEdge(node1: EulerDualNode, node2: EulerDualNode): EulerDualEdge {
         log.trace("Creating edge: ${node1.zone} - ${node2.zone}")
 
-        val b = false
-
-        if (b) {
-            return EulerDualEdge(node1, node2, Line(node1.point.x, node1.point.y, node2.point.x, node2.point.y))
-        }
-
         //Profiler.start("Creating edge")
 
         val p1 = node1.zone.center
         val p2 = node2.zone.center
 
-        val q = QuadCurve()
-        q.fill = null
-        q.stroke = Color.BLACK
-        q.startX = p1.x
-        q.startY = p1.y
-        q.endX = p2.x
-        q.endY = p2.y
-
-        q.controlX = p1.midpoint(p2).x
-        q.controlY = p1.midpoint(p2).y
-
-        val x = q.controlX
-        val y = q.controlY
-
-        var step = CONTROL_POINT_STEP
-        var safetyCount = 0
-
-        var delta = Point2D(step.toDouble(), 0.0)
-        var s = 0
+        val line = Line(p1.x, p1.y, p2.x, p2.y)
 
         // the new curve segment must pass through the straddled curve
         // and only through that curve
@@ -233,47 +210,34 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
 
         log.trace("Searching ${node1.zone} - ${node2.zone} : $curve")
 
-        while (!isOK(q, curve, allContours.values.toList()) && safetyCount < 500) {
-            q.controlX = x + delta.x
-            q.controlY = y + delta.y
+        if (!isOK(line, curve, allContours.values.toList())) {
+            val poly = EdgeRouter.route(node1.zone, node2.zone)
 
-            s++
+            val points = arrayListOf<Double>()
 
-            when (s) {
-                1 -> delta = Point2D(step.toDouble(), step.toDouble())
-                2 -> delta = Point2D(0.0, step.toDouble())
-                3 -> delta = Point2D((-step).toDouble(), step.toDouble())
-                4 -> delta = Point2D((-step).toDouble(), 0.0)
-                5 -> delta = Point2D((-step).toDouble(), (-step).toDouble())
-                6 -> delta = Point2D(0.0, (-step).toDouble())
-                7 -> delta = Point2D(step.toDouble(), (-step).toDouble())
+            //settings.globalMap["astar"] = poly
+
+            // shorten vertices
+            var i = 0
+            while (i < poly.points.size - 2) {
+                points.add(poly.points[i])
+                points.add(poly.points[i+1])
+
+                i += 32
             }
 
-            if (s == 8) {
-                s = 0
-                delta = Point2D(step.toDouble(), 0.0)
-                step *= 2
-            }
+            points.addAll(poly.points.takeLast(2))
 
-            safetyCount++
+            return EulerDualEdge(node1, node2, Polyline(*points.toDoubleArray()))
         }
 
-        log.trace("End Searching with $safetyCount tries")
-
-        //Profiler.end("Creating edge")
-
-        // we failed to find the correct spot
-        if (safetyCount == 500) {
-            throw RuntimeException("Failed to add EGD edge: ${node1.zone} - ${node2.zone}")
-        }
-
-        return EulerDualEdge(node1, node2, q)
+        return EulerDualEdge(node1, node2, line)
     }
 
     /**
      * Does curve segment [q] only pass through [actual] curve.
      */
-    private fun isOK(q: QuadCurve, actual: AbstractCurve, curves: List<Curve>): Boolean {
+    private fun isOK(q: Shape, actual: AbstractCurve, curves: List<Curve>): Boolean {
         val list = curves.filter {
             val s = it.computeShape()
             s.fill = null
@@ -426,11 +390,16 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
                 }
             }
 
+            cycle.smoothingData = arrayListOf()
+
             val path = Path()
             val moveTo = MoveTo(cycle.nodes.get(0).point.x, cycle.nodes.get(0).point.y)
             path.elements.addAll(moveTo)
 
             var tmpPoint = cycle.nodes.get(0).point
+
+            // add the first point (move to)
+            cycle.smoothingData.add(tmpPoint)
 
             cycle.edges.map { it.curve }.forEach { q ->
 
@@ -453,6 +422,8 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
                         quadCurveTo.controlY = q.controlY
 
                         path.elements.addAll(quadCurveTo)
+
+                        throw RuntimeException("CANNOT BE")
                     }
 
                     is Arc -> {
@@ -498,6 +469,8 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
                         tmpPoint = Point2D(arcTo.x, arcTo.y)
 
                         path.elements.add(arcTo)
+
+                        throw RuntimeException("CANNOT BE")
                     }
 
                     is Line -> {
@@ -515,6 +488,52 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
                         tmpPoint = Point2D(lineTo.x, lineTo.y)
 
                         path.elements.add(lineTo)
+                        cycle.smoothingData.add(tmpPoint)
+                    }
+
+                    is Polyline -> {
+
+                        val start = Point2D(q.points[0], q.points[1])
+                        val end = Point2D(q.points[q.points.size-2], q.points[q.points.size-1])
+
+                        val normalOrder: Boolean
+
+                        // we do this coz source and end vertex might be swapped
+                        if (tmpPoint == start) {
+                            normalOrder = true
+                        } else {
+                            normalOrder = false
+                        }
+
+                        tmpPoint = end
+
+                        // e.g. a b c ab ac bc bd bf abc abd abf bcd bcf bdf abcd abdf bcdf
+
+                        if (normalOrder) {
+                            var i = 2
+                            while (i < q.points.size) {
+
+                                val point = Point2D(q.points[i], q.points[++i])
+                                val lineTo = LineTo(point.x, point.y)
+
+                                path.elements.add(lineTo)
+                                cycle.smoothingData.add(point)
+
+                                i++
+                            }
+                        } else {
+                            var i = q.points.size-3
+                            while (i > 0) {
+
+                                val point = Point2D(q.points[i-1], q.points[i])
+                                val lineTo = LineTo(point.x, point.y)
+
+                                path.elements.add(lineTo)
+                                cycle.smoothingData.add(point)
+
+                                i -= 2
+                            }
+                        }
                     }
 
                     else -> {
@@ -522,6 +541,9 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
                     }
                 }
             }
+
+            // drop last duplicate of first moveTO
+            cycle.smoothingData.removeAt(cycle.smoothingData.size - 1)
 
             path.elements.add(ClosePath())
             path.fill = Color.TRANSPARENT

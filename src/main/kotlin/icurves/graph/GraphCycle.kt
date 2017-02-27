@@ -1,5 +1,6 @@
 package icurves.graph
 
+import javafx.geometry.Point2D
 import javafx.scene.shape.Path
 
 
@@ -11,6 +12,7 @@ import javafx.scene.shape.Path
 data class GraphCycle<V, E>(val nodes: List<V>, val edges: List<E>) {
 
     lateinit var path: Path
+    lateinit var smoothingData: MutableList<Point2D>
 
     fun length() = nodes.size
 

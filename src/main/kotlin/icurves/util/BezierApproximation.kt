@@ -21,11 +21,11 @@ object BezierApproximation {
     private val z = 0.5
     private val angleFactor = 0.75
 
-    fun smoothPath2(points: MutableList<Point2D>, smoothFactor: Int): List<Path> {
+    fun smoothPath2(originalPoints: MutableList<Point2D>, smoothFactor: Int): List<Path> {
 
-        val pair = ClosedBezierSpline.GetCurveControlPoints(points.toTypedArray())
+        val pair = ClosedBezierSpline.GetCurveControlPoints(originalPoints.toTypedArray())
 
-        points.add(points[0])
+        val points = originalPoints.plus(originalPoints[0])
 
         val result = arrayListOf<Path>()
 

@@ -18,10 +18,7 @@ import icurves.util.Profiler
 import javafx.collections.FXCollections
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
-import javafx.scene.shape.ClosePath
-import javafx.scene.shape.LineTo
-import javafx.scene.shape.Path
-import javafx.scene.shape.Shape
+import javafx.scene.shape.*
 import org.apache.logging.log4j.LogManager
 import java.util.*
 
@@ -159,85 +156,63 @@ class DiagramCreator(val settings: SettingsController) {
 
         //val cycle = GraphCycle<EulerDualNode, EulerDualEdge>(cycle2.nodes.reversed(), cycle2.edges)
 
-        val pathSegments = BezierApproximation.smoothPath2(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
+        //val pathSegments = BezierApproximation.smoothPath2(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
+        val pathSegments = BezierApproximation.smoothPath2(cycle.smoothingData, settings.smoothFactor)
+
+        println("${cycle.smoothingData.size} vs ${cycle.nodes.size}")
 
         val newPath = Path()
 
         // add moveTo
         newPath.elements.add(cycle.path.elements[0])
 
-        for (j in cycle.nodes.indices) {
-            val node1 = cycle.nodes[j]
-            val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
-
-            // this is to enable joining MED ring with internal edges at C2 continuity
-            // remove first moveTo
-//            pathSegments[j].elements.removeAt(0)
-//
-//            // add to new path
-//            newPath.elements.addAll(pathSegments[j].elements)
-//
-//            if (true)
-//                continue
-
-
-            // check if this is the MED ring segment
-            // No need to check if we use lines?
-            if (node1.zone.abRegion == AbstractBasicRegion.OUTSIDE && node2.zone.abRegion == AbstractBasicRegion.OUTSIDE) {
-                // j + 1 because we skip the first moveTo
-//                            val arcTo = cycle.path.elements[j + 1] as ArcTo
-//
-//                            val start = settings.globalMap[arcTo] as Point2D
-//
-//                            var tmpPath = Path(MoveTo(start.x, start.y), arcTo)
-//                            tmpPath.fill = null
-//                            tmpPath.stroke = Color.BLACK
-//
-//                            //debugShapes.add(tmpPath)
-//
-//                            val ok = !intersects(tmpPath, curveToContour.values.toList())
-//
-//                            println("OK?: $ok")
-//
-//                            if (!ok) {
-//                                arcTo.isSweepFlag = !arcTo.isSweepFlag
-//
-//                                tmpPath = Path(MoveTo(start.x, start.y), arcTo)
-//                                tmpPath.fill = null
-//                                tmpPath.stroke = Color.BLACK
-//
-//                                if (intersects(tmpPath, curveToContour.values.toList())) {
-//                                    //debugShapes.add(tmpPath)
-//                                    throw CannotDrawException("MED ring intersects with diagram")
-//                                } else {
-//                                    println("ALL GOOD")
-//                                }
-//                            }
-
-
-                pathSegments[j].elements.removeAt(0)
-                newPath.elements.addAll(pathSegments[j].elements)
-//                val lineTo = cycle.path.elements[j + 1] as LineTo
-//
-//                newPath.elements.addAll(lineTo)
-                continue
-            }
-
-            // the new curve segment must pass through the straddled curve
-            // and only through that curve
-            val abstractCurve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
-
-            if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
-                // remove first moveTo
-                pathSegments[j].elements.removeAt(0)
-
-                // add to new path
-                newPath.elements.addAll(pathSegments[j].elements)
-            } else {
-                // j + 1 because we skip the first moveTo
-                newPath.elements.addAll(cycle.path.elements[j + 1])
-            }
+        for (path in pathSegments) {
+            path.elements.removeAt(0)
+            newPath.elements.addAll(path.elements)
         }
+
+//        for (j in cycle.nodes.indices) {
+//            val node1 = cycle.nodes[j]
+//            val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]
+//
+//            // this is to enable joining MED ring with internal edges at C2 continuity
+//            // remove first moveTo
+////            pathSegments[j].elements.removeAt(0)
+////
+////            // add to new path
+////            newPath.elements.addAll(pathSegments[j].elements)
+////
+////            if (true)
+////                continue
+//
+//
+//            // check if this is the MED ring segment
+//            // No need to check if we use lines?
+//            if (node1.zone.abRegion == AbstractBasicRegion.OUTSIDE && node2.zone.abRegion == AbstractBasicRegion.OUTSIDE) {
+//                pathSegments[j].elements.removeAt(0)
+//                newPath.elements.addAll(pathSegments[j].elements)
+//
+////                val lineTo = cycle.path.elements[j + 1] as LineTo
+////
+////                newPath.elements.addAll(lineTo)
+//                continue
+//            }
+//
+//            // the new curve segment must pass through the straddled curve
+//            // and only through that curve
+//            val abstractCurve = node1.zone.abRegion.getStraddledContour(node2.zone.abRegion).get()
+//
+//            if (isOK(pathSegments[j], abstractCurve, curveToContour.values.toList())) {
+//                // remove first moveTo
+//                pathSegments[j].elements.removeAt(0)
+//
+//                // add to new path
+//                newPath.elements.addAll(pathSegments[j].elements)
+//            } else {
+//                // j + 1 because we skip the first moveTo
+//                newPath.elements.addAll(cycle.path.elements[j + 1])
+//            }
+//        }
 
         newPath.fill = Color.TRANSPARENT
         newPath.elements.add(ClosePath())
@@ -258,6 +233,24 @@ class DiagramCreator(val settings: SettingsController) {
         val concreteZones = abstractRegions.map { BasicRegion(it, curveToContour) }
 
         modifiedDual = MED(concreteZones, curveToContour)
+
+
+
+//        if (settings.globalMap["astar"] != null) {
+//            println("Printing points")
+//
+//            val poly = settings.globalMap["astar"] as Polyline
+//            debugPoints.add(poly.userData as Point2D)
+//
+//            var i = 0
+//            while (i < poly.points.size) {
+//
+//                val point = Point2D(poly.points[i], poly.points[++i])
+//                debugPoints.add(point)
+//
+//                i++
+//            }
+//        }
     }
 
     /**
