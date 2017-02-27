@@ -171,6 +171,8 @@ class DiagramCreator(val settings: SettingsController) {
             newPath.elements.addAll(path.elements)
         }
 
+        // TODO: we still need to check integrity
+
 //        for (j in cycle.nodes.indices) {
 //            val node1 = cycle.nodes[j]
 //            val node2 = if (j == cycle.nodes.size - 1) cycle.nodes[0] else cycle.nodes[j + 1]

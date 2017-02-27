@@ -210,6 +210,7 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
 
         log.trace("Searching ${node1.zone} - ${node2.zone} : $curve")
 
+        //if (true) {
         if (!isOK(line, curve, allContours.values.toList())) {
             val poly = EdgeRouter.route(node1.zone, node2.zone)
 
@@ -217,7 +218,7 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
 
             //settings.globalMap["astar"] = poly
 
-            // shorten vertices
+            // shorten vertices by i values
             var i = 0
             while (i < poly.points.size - 2) {
                 points.add(poly.points[i])
@@ -233,6 +234,8 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
 
         return EulerDualEdge(node1, node2, line)
     }
+
+    // a b c ab ac ad bc abc abd acd abcd fcba fcb fc fca gba abcg gbc gb
 
     /**
      * Does curve segment [q] only pass through [actual] curve.

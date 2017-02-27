@@ -12,6 +12,7 @@ import java.util.List;
 public class AStarLogic {
 
     private static final int MOVE_COST = 2500;
+    private static final int H_COST = (int) Math.sqrt(MOVE_COST);
 
     /**
      * Since the equality check is based on references,
@@ -29,7 +30,7 @@ public class AStarLogic {
 
         for (int y = 0; y < grid[0].length; y++) {
             for (int x = 0; x < grid.length; x++) {
-                grid[x][y].setHCost((Math.abs(target.getX() - x) + Math.abs(target.getY() - y)) * 50);
+                grid[x][y].setHCost((Math.abs(target.getX() - x) + Math.abs(target.getY() - y)) * H_COST);
             }
         }
 

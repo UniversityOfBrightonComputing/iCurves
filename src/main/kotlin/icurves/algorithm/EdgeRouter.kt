@@ -20,7 +20,7 @@ object EdgeRouter {
 
         val union = Polygons2D.union(region1.getPolygonShape(), region2.getPolygonShape())
 
-        val maxDistance = union.distance(region1.center.x, region1.center.y)
+        //val maxDistance = union.distance(region1.center.x, region1.center.y)
 
         val bbox = union.boundingBox()
 
@@ -36,16 +36,26 @@ object EdgeRouter {
             for (x in 0 until grid.width) {
                 val tileCenter = Point2D(x.toDouble() * TILE_SIZE + TILE_SIZE / 2 + bbox.minX, y.toDouble() * TILE_SIZE + TILE_SIZE / 2 + bbox.minY)
 
-                if (union.contains(tileCenter)) {
-                    grid.setNodeState(x, y,  NodeState.WALKABLE)
+                try {
+                    if (union.contains(tileCenter)) {
+                        grid.setNodeState(x, y, NodeState.WALKABLE)
 
-                    val dist = -boundary.signedDistance(tileCenter).toInt()
+                        val dist = -boundary.signedDistance(tileCenter).toInt()
 
-                    grid.getNode(x, y).gCost = 50000 - dist * 100
+                        grid.getNode(x, y).gCost = 100000 - dist * 1000
 
-                    //println("Distance: $dist, gCost: ${grid.getNode(x, y).gCost}")
-                } else {
-                    grid.setNodeState(x, y,  NodeState.NOT_WALKABLE)
+                        if (grid.getNode(x, y).gCost < 0) {
+                            println("Distance: $dist, gCost: ${grid.getNode(x, y).gCost}")
+
+                            grid.getNode(x, y).gCost = 0
+                        }
+
+
+                    } else {
+                        grid.setNodeState(x, y, NodeState.NOT_WALKABLE)
+                    }
+                } catch (e: Exception) {
+                    grid.setNodeState(x, y, NodeState.NOT_WALKABLE)
                 }
             }
         }
