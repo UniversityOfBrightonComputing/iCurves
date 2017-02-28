@@ -15,10 +15,10 @@ class Polylabel {
     companion object {
         val precision = 1.0
 
-        // a priority queue of cells in order of their "potential" (max distance to polygon)
-        private val cellQueue = PriorityQueue<Cell>(Comparator { a, b -> (b.max - a.max).toInt() })
-
         @JvmStatic fun findCenter(polygon: Polygon2D): Point2D {
+
+            // a priority queue of cells in order of their "potential" (max distance to polygon)
+            val cellQueue = PriorityQueue<Cell>(Comparator { a, b -> (b.max - a.max).toInt() })
 
             // find the bounding box of the outer ring
             val bbox = polygon.boundingBox()
