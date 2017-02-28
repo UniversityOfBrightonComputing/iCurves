@@ -155,32 +155,20 @@ class DiagramCreator(val settings: SettingsController) {
     }
 
     private fun embedDoublePiercing(abstractCurve: AbstractCurve, regions: List<BasicRegion>): Curve {
-        val center = regions.map { it.getPolygonShape().vertices() }
-                .flatten()
-                .groupBy({ it.asInt })
-                // we search for a vertex that is present in all four regions
-                .filter { it.value.size == 4 }
-                .map { Point2D(it.key.getX(), it.key.getY()) }
-                .firstOrNull() ?: throw RuntimeException("Bug: 2-piercing center not found")
+        val piercingData = PiercingData(regions, basicRegions)
 
-        val radius = basicRegions
-                .minus(regions)
-                .map { it.center.distance(center) }
-                .sorted()
-                .first()
+        if (!piercingData.isPiercing()) {
+            throw RuntimeException("Bug: not 2-piercing")
+        }
 
-        return CircleCurve(abstractCurve, center.x, center.y, radius / 2)
+        return CircleCurve(abstractCurve, piercingData.center!!.x, piercingData.center.y, piercingData.radius / 2)
     }
 
     private fun smooth(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Path {
         Profiler.start("Smoothing")
 
-        //val cycle = GraphCycle<EulerDualNode, EulerDualEdge>(cycle2.nodes.reversed(), cycle2.edges)
-
         //val pathSegments = BezierApproximation.smoothPath2(cycle.nodes.map { it.point }.toMutableList(), settings.smoothFactor)
         val pathSegments = BezierApproximation.smoothPath2(cycle.smoothingData, settings.smoothFactor)
-
-        println("${cycle.smoothingData.size} vs ${cycle.nodes.size}")
 
         val newPath = Path()
 

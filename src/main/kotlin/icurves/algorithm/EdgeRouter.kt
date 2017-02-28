@@ -14,7 +14,7 @@ import math.geom2d.polygon.Polygons2D
  */
 object EdgeRouter {
 
-    private val TILES = 25
+    private val TILES = 50
 
     fun route(region1: BasicRegion, region2: BasicRegion): Polyline {
 
@@ -62,7 +62,7 @@ object EdgeRouter {
 
                         node.state = NodeState.WALKABLE
                         //node.gCost = 100000 - dist * 1000
-                        node.gCost = ((1 - dist / maxDistance) * 2500).toInt()
+                        node.gCost = ((2 - dist / maxDistance) * 2500).toInt()
 
                         if (node.gCost < 0) {
                             println("Distance: $dist, gCost: ${node.gCost}")
@@ -88,6 +88,10 @@ object EdgeRouter {
         println("$startX,$startY - $targetX,$targetY")
 
         val path = grid.getPath(startX.toInt(), startY.toInt(), targetX.toInt(), targetY.toInt())
+
+        if (path.isEmpty()) {
+            println("Edge routing A* not found")
+        }
 
         // so that start and end vertices are exactly the same as requested
         val points = arrayListOf<Double>(region1.center.x, region1.center.y)

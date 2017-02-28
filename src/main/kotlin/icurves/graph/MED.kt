@@ -284,6 +284,8 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
     /**
      * A cycle is valid if it can be used to embed a curve.
+     * TODO: speed up if check done on request, e.g. do not compute all valid at once
+     * but just enumerate them and then after good ones are found, start validating them
      */
     private fun isValid(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Boolean {
         log.trace("Checking cycle: $cycle")
