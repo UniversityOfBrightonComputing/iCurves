@@ -29,7 +29,7 @@ data class RecompositionData(
 
     fun isSinglePiercing() = splitZones.size == 2
 
-    fun isDoublePiercing() = splitZones.size == 4
+    fun isMaybeDoublePiercing() = splitZones.size == 4
 
     fun isNotPiercing() = splitZones.size > 4
 
