@@ -31,7 +31,6 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
     lateinit var nodes: MutableList<EulerDualNode>
     lateinit var edges: MutableList<EulerDualEdge>
-    lateinit var cycles: List<GraphCycle<EulerDualNode, EulerDualEdge>>
 
     private val settings: SettingsController
 
@@ -41,8 +40,6 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
         computeEGD()
 
         computeMED()
-
-        initCycles()
     }
 
     private fun computeEGD() {
@@ -162,8 +159,6 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
     private fun createEdge(node1: EulerDualNode, node2: EulerDualNode): EulerDualEdge {
         log.trace("Creating edge: ${node1.zone} - ${node2.zone}")
 
-        //Profiler.start("Creating edge")
-
         val p1 = node1.zone.center
         val p2 = node2.zone.center
 
@@ -258,28 +253,6 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
             edges.add(EulerDualEdge(node1, node2, Line(p1.x, p1.y, p2.x, p2.y)))
         }
-    }
-
-    /**
-     * Compute all valid cycles.
-     */
-    private fun computeValidCycles(): List<GraphCycle<EulerDualNode, EulerDualEdge>> {
-        val graph = CycleFinder<EulerDualNode, EulerDualEdge>(EulerDualEdge::class.java)
-        nodes.forEach { graph.addVertex(it) }
-        edges.forEach { graph.addEdge(it.v1, it.v2, it) }
-
-        Profiler.start("Enumerating cycles")
-
-        val allCycles = graph.computeCycles()
-
-        Profiler.end("Enumerating cycles")
-
-        log.info("Found cycles: ${allCycles.size}")
-
-        return Stream.of(*allCycles.toTypedArray())
-                .parallel()
-                .filter { isValid(it) }
-                .collect(Collectors.toList()) as List<GraphCycle<EulerDualNode, EulerDualEdge>>
     }
 
     /**
@@ -423,18 +396,30 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
         return true
     }
 
-    private fun initCycles() {
-        Profiler.start("Computing all cycles")
+    /**
+     * Enumerate all simple cycles.
+     */
+    private fun enumerateCycles(): List<GraphCycle<EulerDualNode, EulerDualEdge>> {
+        val graph = CycleFinder<EulerDualNode, EulerDualEdge>(EulerDualEdge::class.java)
+        nodes.forEach { graph.addVertex(it) }
+        edges.forEach { graph.addEdge(it.v1, it.v2, it) }
 
-        cycles = computeValidCycles()
-
-        Profiler.end("Computing all cycles")
-
-        log.info("Valid cycles: ${cycles.size}")
+        return graph.computeCycles()
     }
 
     fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): Optional<GraphCycle<EulerDualNode, EulerDualEdge>> {
-        return Optional.ofNullable(cycles.filter { it.nodes.map { it.zone.abRegion }.containsAll(zonesToSplit) }.firstOrNull())
+        log.trace("Computing cycle for $zonesToSplit")
+
+        Profiler.start("Enumerating cycles")
+        val cycles = enumerateCycles()
+        Profiler.end("Enumerating cycles")
+
+        log.info("Found cycles: ${cycles.size}")
+
+        return Optional.ofNullable(
+                // check that cycle nodes are equal or superset of what is required        and is valid
+                cycles.find { it.nodes.map { it.zone.abRegion }.containsAll(zonesToSplit) && isValid(it) }
+        )
     }
 
     /**
