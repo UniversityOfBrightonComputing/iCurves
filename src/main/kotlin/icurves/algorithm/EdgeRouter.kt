@@ -45,7 +45,7 @@ object EdgeRouter {
                         grid.getNode(x, y).gCost = 100000 - dist * 1000
 
                         if (grid.getNode(x, y).gCost < 0) {
-                            println("Distance: $dist, gCost: ${grid.getNode(x, y).gCost}")
+                            //println("Distance: $dist, gCost: ${grid.getNode(x, y).gCost}")
 
                             grid.getNode(x, y).gCost = 0
                         }

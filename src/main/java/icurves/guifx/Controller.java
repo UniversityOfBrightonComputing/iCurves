@@ -320,6 +320,18 @@ public class Controller {
         @Override
         protected void succeeded() {
 
+            settings.debugPoints.forEach(p -> {
+                Circle point = new Circle(p.getX(), p.getY(), 10, Color.BLACK);
+
+                Text coord = new Text((int) p.getX() + "," + (int) p.getY());
+                coord.setTranslateX(p.getX());
+                coord.setTranslateY(p.getY() - 10);
+
+                renderer.rootSceneGraph.getChildren().addAll(point, coord);
+            });
+
+            settings.debugPoints.clear();
+
             // draw any debug points
             newCreator.getDebugPoints().forEach(p -> {
                 Circle point = new Circle(p.getX(), p.getY(), 10, Color.LIGHTSKYBLUE);

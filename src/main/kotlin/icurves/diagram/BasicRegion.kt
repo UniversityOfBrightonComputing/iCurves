@@ -1,5 +1,6 @@
 package icurves.diagram
 
+import icurves.CurvesApp
 import icurves.description.AbstractBasicRegion
 import icurves.description.AbstractCurve
 import icurves.util.Polylabel
@@ -42,17 +43,8 @@ class BasicRegion(
         }
     }
 
-    val bbox: Shape
-
-    init {
-        // TODO: make global bbox
-        bbox = Rectangle(10000.0, 10000.0)
-        bbox.translateX = -3000.0
-        bbox.translateY = -3000.0
-    }
-
     fun getShape(): Shape {
-        var shape: Shape = bbox
+        var shape: Shape = CurvesApp.getInstance().settings.fxBBox
 
         for (curve in containingCurves) {
             shape = Shape.intersect(shape, curve.getShape())
@@ -81,10 +73,7 @@ class BasicRegion(
     private var polygonShape: Polygon2D? = null
 
     fun getPolygonShape(): Polygon2D {
-        polygonShape = SimplePolygon2D(math.geom2d.Point2D(0.0, 0.0),
-                math.geom2d.Point2D(10000.0, 0.0),
-                math.geom2d.Point2D(10000.0, 10000.0),
-                math.geom2d.Point2D(0.0, 10000.0))
+        polygonShape = CurvesApp.getInstance().settings.geomBBox
 
         containingCurves.map({ c -> c.getPolygon() }).forEach { p -> polygonShape = Polygons2D.intersection(polygonShape!!, p) }
 

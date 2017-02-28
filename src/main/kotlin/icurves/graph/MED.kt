@@ -75,7 +75,7 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
          * 4. create extra "arc" edges around the diagram
          */
 
-        val bounds = allZones.map { it.getShape().layoutBounds }
+        val bounds = allZones.map { it.getPolygonShape().boundingBox() }
 
         val minX = bounds.map { it.minX }.min()
         val minY = bounds.map { it.minY }.min()
@@ -84,19 +84,43 @@ class MED(val allZones: List<BasicRegion>, private val allContours: Map<Abstract
 
         val center = Point2D((minX!! + maxX!!) / 2, (minY!! + maxY!!) / 2)
 
-        val w = (maxX - minX) / 2
-        val h = (maxY - minY) / 2
+        val w = (maxX - minX)
+        val h = (maxY - minY)
+
+        //val radius = Math.max(w, h) / 2 + settings.medSize
 
         // half diagonal of the bounds rectangle + distance between diagram and MED
-        val radius = Math.sqrt(w*w + h*h) + settings.medSize
+        val radius = Math.sqrt(w*w + h*h) / 2 + settings.medSize
 
         Profiler.start("Creating MED nodes")
 
         val polygonMED = Converter.toPolygon2D(Converter.makePolygon(radius.toInt(), 16))
         val outside = BasicRegion(AbstractBasicRegion.OUTSIDE, allContours)
 
+        val firstPt = Point2D(center.x - radius, center.y)
+        val vector = firstPt.subtract(polygonMED.vertex(0).x(), polygonMED.vertex(0).y())
+
         val nodesMED = polygonMED.vertices()
-                .map { EulerDualNode(outside, Point2D(it.x(), it.y()).subtract(w/2, h/2)) }
+                .map { EulerDualNode(outside, Point2D(it.x(), it.y()).add(vector)) }
+
+
+
+
+
+//        settings.debugPoints.add(Point2D(minX, minY))
+//        settings.debugPoints.add(Point2D(minX, maxY))
+//        settings.debugPoints.add(Point2D(maxX, minY))
+//        settings.debugPoints.add(Point2D(maxX, maxY))
+
+
+
+
+
+
+
+
+
+
 
 
         // add the adjacent edges between outside in inside
