@@ -11,6 +11,7 @@ import icurves.graph.EulerDualNode
 import icurves.graph.GraphCycle
 import icurves.graph.MED
 import icurves.guifx.SettingsController
+import icurves.recomposition.PiercingData
 import icurves.recomposition.RecomposerFactory
 import icurves.recomposition.RecompositionData
 import icurves.util.BezierApproximation
@@ -43,16 +44,25 @@ class DiagramCreator(val settings: SettingsController) {
      */
     val curveToContour = FXCollections.observableMap(LinkedHashMap<AbstractCurve, Curve>())
 
+    val abRegionToBasicRegion = FXCollections.observableMap(LinkedHashMap<AbstractBasicRegion, BasicRegion>())
+
     /**
      * Abstract basic regions we have processed so far.
      */
     private val abstractRegions = ArrayList<AbstractBasicRegion>()
+
+    /**
+     * Basic regions for current step.
+     * Immutable, gets rewritten every step.
+     */
+    private lateinit var basicRegions: List<BasicRegion>
+
     val shadedRegions = ArrayList<BasicRegion>()
 
     lateinit var modifiedDual: MED
 
-    val debugPoints = arrayListOf<Point2D>()
-    val debugShapes = arrayListOf<Shape>()
+    val debugPoints = ArrayList<Point2D>()
+    val debugShapes = ArrayList<Shape>()
 
     fun createDiagram(description: Description) {
 
@@ -81,8 +91,10 @@ class DiagramCreator(val settings: SettingsController) {
             }
         }
 
-        if (settings.showMED())
+        if (settings.showMED()) {
+            createBasicRegions()
             createMED()
+        }
 
         log.trace("Generating shaded zones")
 
@@ -100,31 +112,44 @@ class DiagramCreator(val settings: SettingsController) {
      * 4. updates abstract regions
      */
     private fun embedCurve(data: RecompositionData): Curve {
-        createMED()
+        log.trace("Embed curve with regions: ${data.splitZones}")
 
-        log.trace("Searching cycle with zones: ${data.splitZones}")
+        var curve: Curve? = null
 
-        val cycle = modifiedDual.computeCycle(
-                data.splitZones
-        ).orElseThrow { RuntimeException("Bug: Failed to find cycle") }
+        createBasicRegions()
 
-        var curve: Curve = PathCurve(data.addedCurve, cycle.path)
+        if (data.isMaybeDoublePiercing()) {
+            val piercingData = PiercingData(data.splitZones.map { abRegionToBasicRegion[it]!! }, basicRegions)
+            if (piercingData.isPiercing()) {
+                curve = CircleCurve(data.addedCurve, piercingData.center!!.x, piercingData.center.y, piercingData.radius / 2)
 
-        //var curve: Curve = PolygonCurve(data.addedCurve, cycle.nodes.map { it.point })
-
-        if (cycle.nodes.size == 4) {
-            curve = embedDoublePiercing(data.addedCurve, cycle.nodes.map { it.zone })
+                abstractRegions.addAll(data.splitZones.map { it.moveInside(data.addedCurve) })
+            }
         }
 
-        if (settings.useSmooth() && curve !is CircleCurve) {
-            val smoothedPath = smooth(cycle)
+        if (curve == null) {
+            createMED()
 
-            curve = PathCurve(data.addedCurve, smoothedPath)
+            val cycle = modifiedDual.computeCycle(
+                    data.splitZones
+            ).orElseThrow { RuntimeException("Bug: Failed to find cycle") }
+
+            curve = PathCurve(data.addedCurve, cycle.path)
+
+            if (cycle.nodes.size == 4) {
+                curve = embedDoublePiercing(data.addedCurve, cycle.nodes.map { it.zone })
+            }
+
+            if (settings.useSmooth() && curve !is CircleCurve) {
+                val smoothedPath = smooth(cycle)
+
+                curve = PathCurve(data.addedCurve, smoothedPath)
+            }
+
+            // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
+            // we also call distinct() to ensure we don't reuse the outside zone more than once
+            abstractRegions.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
         }
-
-        // we might've used more zones to get a cycle, so we make sure we capture all of the used ones
-        // we also call distinct() to ensure we don't reuse the outside zone more than once
-        abstractRegions.addAll(cycle.nodes.map { it.zone.abRegion.moveInside(data.addedCurve) }.distinct())
 
         return curve
     }
@@ -138,17 +163,13 @@ class DiagramCreator(val settings: SettingsController) {
                 .map { Point2D(it.key.getX(), it.key.getY()) }
                 .firstOrNull() ?: throw RuntimeException("Bug: 2-piercing center not found")
 
-//        val radius = regions.map { it.center.distance(center) }
-//                .sorted()
-//                .first()
-
-        val radius = modifiedDual.allZones
+        val radius = basicRegions
                 .minus(regions)
                 .map { it.center.distance(center) }
                 .sorted()
                 .first()
 
-        return CircleCurve(abstractCurve, center.x, center.y, radius / 3)
+        return CircleCurve(abstractCurve, center.x, center.y, radius / 2)
     }
 
     private fun smooth(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Path {
@@ -224,19 +245,23 @@ class DiagramCreator(val settings: SettingsController) {
         return newPath
     }
 
+    private fun createBasicRegions() {
+        basicRegions = abstractRegions.map {
+            val br = BasicRegion(it, curveToContour)
+            abRegionToBasicRegion[it] = br
+            return@map br
+        }
+    }
+
     /**
-     * Needs to be generated every time because contours change zones.
+     * Needs to be generated every time because curves change basic regions.
      *
-     * TODO: we could potentially only compute zones that have been changed by the curve
+     * TODO: we could potentially only compute br that have been changed by the curve
      */
     private fun createMED() {
         log.trace("Creating MED")
 
-        val concreteZones = abstractRegions.map { BasicRegion(it, curveToContour) }
-
-        modifiedDual = MED(concreteZones, curveToContour)
-
-
+        modifiedDual = MED(basicRegions, curveToContour)
 
 //        if (settings.globalMap["astar"] != null) {
 //            println("Printing points")
@@ -287,38 +312,4 @@ class DiagramCreator(val settings: SettingsController) {
 
         return list.isNotEmpty()
     }
-
-    // 4 nodes can (maybe?) make a nice circle
-
-    // a 4 node cluster is currently a minimum, since 2 nodes not a cycle
-    //                if (cycle.nodes.size == 4) {
-    //
-    //                    // scale to make it larger to check intersection
-    //                    val bounds = cycle.nodes
-    //                            .map { it.zone.shape }
-    //                            .map {
-    //                                it.scaleX = 1.2
-    //                                it.scaleY = 1.2
-    //                                it
-    //                            }
-    //                            .reduceRight { s1, s2 -> Shape.intersect(s1, s2) }
-    //                            .layoutBounds
-    //
-    //                    // scale back
-    //                    cycle.nodes.map { it.zone.shape }.forEach {
-    //                        it.scaleX = 1.0
-    //                        it.scaleY = 1.0
-    //                    }
-    //
-    //                    val center = Point2D(bounds.minX + bounds.width / 2, bounds.minY + bounds.height / 2)
-    //
-    //                    //val minRadius = BASE_CURVE_RADIUS / 5
-    //
-    //                    val minRadius = Math.min(bounds.width, bounds.height) / 2
-    //
-    //                    //println(center)
-    //                    //debugPoints.add(center)
-    //
-    //                    contour = CircleCurve(center.x, center.y, minRadius, data.addedCurve)
-    //                }
 }
