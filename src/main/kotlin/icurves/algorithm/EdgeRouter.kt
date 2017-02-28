@@ -14,7 +14,7 @@ import math.geom2d.polygon.Polygons2D
  */
 object EdgeRouter {
 
-    private val TILES = 50
+    private val TILES = 25
 
     fun route(region1: BasicRegion, region2: BasicRegion): Polyline {
 
@@ -30,7 +30,7 @@ object EdgeRouter {
 
 
 
-        println("Grid size: ${grid.width}x${grid.height}")
+        println("Grid size: ${grid.width}x${grid.height} Tile size: $TILE_SIZE")
 
 
 

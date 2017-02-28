@@ -130,9 +130,7 @@ class DiagramCreator(val settings: SettingsController) {
         if (curve == null) {
             createMED()
 
-            val cycle = modifiedDual.computeCycle(
-                    data.splitZones
-            ).orElseThrow { RuntimeException("Bug: Failed to find cycle") }
+            val cycle = modifiedDual.computeCycle(data.splitZones) ?: throw RuntimeException("Bug: Failed to find cycle")
 
             curve = PathCurve(data.addedCurve, cycle.path)
 
@@ -254,8 +252,9 @@ class DiagramCreator(val settings: SettingsController) {
 //        if (settings.globalMap["astar"] != null) {
 //            println("Printing points")
 //
+//            debugPoints.clear()
+//
 //            val poly = settings.globalMap["astar"] as Polyline
-//            debugPoints.add(poly.userData as Point2D)
 //
 //            var i = 0
 //            while (i < poly.points.size) {

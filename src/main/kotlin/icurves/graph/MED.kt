@@ -190,7 +190,11 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
             points.addAll(poly.points.takeLast(2))
 
-            return EulerDualEdge(node1, node2, Polyline(*points.toDoubleArray()))
+            val newPoly = Polyline(*points.toDoubleArray())
+
+            settings.globalMap["astar"] = newPoly
+
+            return EulerDualEdge(node1, node2, newPoly)
         }
 
         return EulerDualEdge(node1, node2, line)
@@ -257,8 +261,6 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
     /**
      * A cycle is valid if it can be used to embed a curve.
-     * TODO: speed up if check done on request, e.g. do not compute all valid at once
-     * but just enumerate them and then after good ones are found, start validating them
      */
     private fun isValid(cycle: GraphCycle<EulerDualNode, EulerDualEdge>): Boolean {
         log.trace("Checking cycle: $cycle")
@@ -407,7 +409,7 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
         return graph.computeCycles()
     }
 
-    fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): Optional<GraphCycle<EulerDualNode, EulerDualEdge>> {
+    fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): GraphCycle<EulerDualNode, EulerDualEdge>? {
         log.trace("Computing cycle for $zonesToSplit")
 
         Profiler.start("Enumerating cycles")
@@ -416,10 +418,8 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
         log.info("Found cycles: ${cycles.size}")
 
-        return Optional.ofNullable(
-                // check that cycle nodes are equal or superset of what is required        and is valid
-                cycles.find { it.nodes.map { it.zone.abRegion }.containsAll(zonesToSplit) && isValid(it) }
-        )
+        //        check that cycle nodes are equal or superset of what is required        and is valid
+        return cycles.find { it.nodes.map { it.zone.abRegion }.containsAll(zonesToSplit) && isValid(it) }
     }
 
     /**
