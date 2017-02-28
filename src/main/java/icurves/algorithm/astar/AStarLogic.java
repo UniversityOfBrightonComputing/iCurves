@@ -12,7 +12,7 @@ import java.util.List;
 public class AStarLogic {
 
     private static final int MOVE_COST = 2500;
-    private static final int H_COST = (int) Math.sqrt(MOVE_COST);
+    private static final int H_COST = (int) Math.sqrt(0);
 
     /**
      * Since the equality check is based on references,

@@ -23,6 +23,8 @@ object Examples {
         add("Double Piercing 3", "a b c d ac ad bc bd cd ce df abd acd ace bcd bce bdf cdf abcd abce bcdf")
 
         add("Edge Route", "a b c ab ac bc bd bf abc abd abf bcd bcf bdf abcd abdf bcdf")
+        add("Edge Route 1", "a b c d ab ac ad bc bd be cd abc abd abe acd bcd bce bde abcd abce abde")
+        add("Edge Route 2", "a b c d ab ac ad ae af bc bd cd abc abd acd ace acf adf bcd abcd acde adef")
     }
 
     private fun add(name: String, description: String) {

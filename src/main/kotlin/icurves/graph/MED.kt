@@ -13,6 +13,7 @@ import icurves.util.Profiler
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
 import javafx.scene.shape.*
+import math.geom2d.polygon.SimplePolygon2D
 import org.apache.logging.log4j.LogManager
 import java.util.*
 import java.util.stream.Collectors
@@ -177,6 +178,10 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
         if (!isOK(line, curve, allContours.values.toList())) {
             val poly = EdgeRouter.route(node1.zone, node2.zone)
 
+            if (poly.points.size == 4) {
+                throw RuntimeException("Failed to route edge: ${node1.zone} - ${node2.zone}")
+            }
+
             val points = arrayListOf<Double>()
 
             // shorten vertices by i values
@@ -268,6 +273,8 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
         val allCycles = graph.computeCycles()
 
         Profiler.end("Enumerating cycles")
+
+        log.info("Found cycles: ${allCycles.size}")
 
         return Stream.of(*allCycles.toTypedArray())
                 .parallel()
@@ -372,8 +379,18 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
             }
         }
 
+        // TODO: we can use this polygon to check inside vertex?
+
+//        17:09:38.474 [Diagram Creation Thread] INFO  icurves.graph.MED - Found cycles: 183496
+//        Computing all cycles took: 33.697 sec
+//        17:10:10.744 [Diagram Creation Thread] INFO  icurves.graph.MED - Valid cycles: 26746
+//        Diagram creation took: 34.514 sec
+        //val polygon = SimplePolygon2D(cycle.smoothingData.map { math.geom2d.Point2D(it.x, it.y) })
+
         // drop last duplicate of first moveTO
         cycle.smoothingData.removeAt(cycle.smoothingData.size - 1)
+
+
 
         path.elements.add(ClosePath())
         path.fill = Color.TRANSPARENT
@@ -393,6 +410,7 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
             log.trace("Checking vertex $it")
 
+            //if (polygon.contains(it.point.x, it.point.y)) {
             if (path.contains(it.point)) {
                 log.trace("Discarding cycle because of inside vertex: ${it.point}")
                 return false
@@ -410,7 +428,7 @@ class MED(val allBasicRegions: List<BasicRegion>, private val allContours: Map<A
 
         Profiler.end("Computing all cycles")
 
-        log.debug("Valid cycles: $cycles")
+        log.info("Valid cycles: ${cycles.size}")
     }
 
     fun computeCycle(zonesToSplit: List<AbstractBasicRegion>): Optional<GraphCycle<EulerDualNode, EulerDualEdge>> {

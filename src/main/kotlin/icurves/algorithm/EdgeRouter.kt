@@ -14,48 +14,68 @@ import math.geom2d.polygon.Polygons2D
  */
 object EdgeRouter {
 
-    private val TILE_SIZE = 50
+    private val TILES = 25
 
     fun route(region1: BasicRegion, region2: BasicRegion): Polyline {
 
         val union = Polygons2D.union(region1.getPolygonShape(), region2.getPolygonShape())
 
-        //val maxDistance = union.distance(region1.center.x, region1.center.y)
+
 
         val bbox = union.boundingBox()
 
-        println("${bbox.minX}  ${bbox.minY}")
+        val TILE_SIZE = (Math.min(bbox.width, bbox.height) / TILES).toInt()
 
         val grid = AStarGrid(bbox.width.toInt() / TILE_SIZE, bbox.height.toInt() / TILE_SIZE)
 
+
+
         println("Grid size: ${grid.width}x${grid.height}")
 
+
+
+
         val boundary = union.boundary()
+
+        // signed, so - if inside
+        val maxDistance: Double = try {
+            -Math.min(boundary.signedDistance(region1.center.x, region1.center.y), boundary.signedDistance(region2.center.x, region2.center.y))
+        } catch (e: Exception) {
+            1000.0
+        }
 
         for (y in 0 until grid.height) {
             for (x in 0 until grid.width) {
                 val tileCenter = Point2D(x.toDouble() * TILE_SIZE + TILE_SIZE / 2 + bbox.minX, y.toDouble() * TILE_SIZE + TILE_SIZE / 2 + bbox.minY)
 
+                val node = grid.getNode(x, y)
+
                 try {
                     if (union.contains(tileCenter)) {
-                        grid.setNodeState(x, y, NodeState.WALKABLE)
-
                         val dist = -boundary.signedDistance(tileCenter).toInt()
 
-                        grid.getNode(x, y).gCost = 100000 - dist * 1000
+                        if (dist < TILE_SIZE) {
+                            node.state = NodeState.NOT_WALKABLE
+                            continue
+                        }
 
-                        if (grid.getNode(x, y).gCost < 0) {
-                            //println("Distance: $dist, gCost: ${grid.getNode(x, y).gCost}")
 
-                            grid.getNode(x, y).gCost = 0
+                        node.state = NodeState.WALKABLE
+                        //node.gCost = 100000 - dist * 1000
+                        node.gCost = ((1 - dist / maxDistance) * 2500).toInt()
+
+                        if (node.gCost < 0) {
+                            println("Distance: $dist, gCost: ${node.gCost}")
+
+                            node.gCost = 0
                         }
 
 
                     } else {
-                        grid.setNodeState(x, y, NodeState.NOT_WALKABLE)
+                        node.state = NodeState.NOT_WALKABLE
                     }
                 } catch (e: Exception) {
-                    grid.setNodeState(x, y, NodeState.NOT_WALKABLE)
+                    node.state = NodeState.NOT_WALKABLE
                 }
             }
         }
