@@ -27,6 +27,8 @@
 package icurves.algorithm;
 
 /**
+ * Adapted from https://www.codeproject.com/Articles/33776/Draw-Closed-Smooth-Curve-with-Bezier-Spline
+ *
  * @author Almas Baimagambetov (almaslvl@gmail.com)
  */
 /// <summary>
